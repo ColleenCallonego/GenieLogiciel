@@ -5,9 +5,9 @@ public class Table {
     private int nbplace;
     private String etattable;
     private String etatrepas;
-    private int serveurId;
+    private String serveurId;
 
-    public Table(int numero, int nbplace, String etattable, String etatrepas, int serveurId){
+    public Table(int numero, int nbplace, String etattable, String etatrepas, String serveurId){
         this.numero = numero;
         this.nbplace = nbplace;
         this.etattable = etattable;
@@ -19,11 +19,20 @@ public class Table {
         return numero;
     }
 
-    public int getServer() {
-        return serveurId;
+    public int getNbplace() {
+        return nbplace;
     }
 
     public String getEtattable(){
         return etattable;
     }
+
+    public String getEtatrepas(){
+        return etatrepas;
+    }
+
+    public String getServer() {
+        return serveurId;
+    }
+
 }
