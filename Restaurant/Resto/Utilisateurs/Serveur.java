@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Server extends Utilisateur{
+public class Serveur extends Utilisateur{
     private ArrayList<Table> listTables;
 
-    public Server(String id){
+    public Serveur(String id){
         super(id);
         listTables = new ArrayList<>();
     }
@@ -40,7 +40,7 @@ public class Server extends Utilisateur{
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
             if (table.getServer().equals(id)){
-                System.out.println(ColorText.COL_GREEN + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                colorerTable(table);
             }
             else{
                 System.out.println(ColorText.COL_BRIGHT_WHITE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
@@ -60,6 +60,26 @@ public class Server extends Utilisateur{
         }
         scan.close();
         return rep;
+    }
+
+    private void colorerTable(Table table) {
+        switch(table.getEtattable()) {
+            case "Libre":
+                System.out.println(ColorText.COL_GREEN + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                break;
+            case "Occupée":
+                System.out.println(ColorText.COL_YELLOW + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                break;
+            case "Débarrasée":
+                System.out.println(ColorText.COL_RED + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                break;
+            case "Réservée":
+                System.out.println(ColorText.COL_CYAN + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                break;
+            case "Dressée":
+                System.out.println(ColorText.COL_PURPLE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                break;
+        }
     }
 
     /**
