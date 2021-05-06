@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Serveur extends Utilisateur{
+public class Serveur extends Utilisateur {
     private ArrayList<Table> listTables;
 
-    public Serveur(String id){
+    public Serveur(String id) {
         super(id);
         listTables = new ArrayList<>();
     }
 
-    public void recupTables(){
+    public void recupTables() {
         try {
-            String url= "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn= DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
             while(rs.next()) {
@@ -33,7 +33,7 @@ public class Serveur extends Utilisateur{
     }
 
     @Override
-    public Integer afficherPrincipal(){
+    public Integer afficherPrincipal() {
         recupTables();
         int rep = -1;
         Scanner scan = new Scanner(System.in);
@@ -47,11 +47,11 @@ public class Serveur extends Utilisateur{
             }
         }
         System.out.println("--------------------------------------" + n + "Bienvenue en salle, prêt à servir ? " + n
-                + "--------------------------------------" + n + "1-" + listTables.size() + ". Selectionner une table" + n
-                + "0. Se déconnecter" + n + n + n + "Que voulez vous faire?");
+                + "--------------------------------------" + n + "1-" + listTables.size() + ". Selectionner une table"
+                + n + "0. Se déconnecter" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
-            if (!verifServTable(rep)) {
+            if (!verif(rep, listTables.size() + 1)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
@@ -85,21 +85,21 @@ public class Serveur extends Utilisateur{
     /**
      * Méthode pour afficher l'écran d'une table au fois que le serveur l'a choisie.
      *
-     * @param table  table sélectionnée
+     * @param table table sélectionnée
      * @return le choix du serveur
      */
     public static Integer EcranTableServeur(Table table) {
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
-        System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero() + n
-                + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n + "Etat du repas : "
-                + table.getEtatrepas() + n + n + "--------------------------------------" + n + "1. Changer le status de la table"
-                + n + "2. Ajouter un plat" + n + "3. Obtenir la facture" + n + "0. Retourner à l'écran principal" + n
-                + n + n + "Que voulez vous faire?");
+        System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
+                + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
+                + "Etat du repas : " + table.getEtatrepas() + n + n + "--------------------------------------" + n
+                + "1. Changer le status de la table" + n + "2. Ajouter un plat" + n + "3. Obtenir la facture" + n
+                + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
-            if (!verifServTable(rep)) {
+            if (!verif(rep, 4)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
@@ -109,20 +109,4 @@ public class Serveur extends Utilisateur{
         scan.close();
         return rep;
     }
-
-    /**
-     * Méthode pour vérifier que le choix de serveur est possible
-     *
-     * @param entree choix du serveur
-     * @return true si le choix existe et false sinon
-     */
-    public static Boolean verifServTable(int entree) {
-        ArrayList<Integer> possibilite = new ArrayList<Integer>();
-        possibilite.add(0);
-        possibilite.add(1);
-        possibilite.add(2);
-        possibilite.add(3);
-        return possibilite.contains(entree);
-    }
-
 }

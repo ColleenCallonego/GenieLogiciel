@@ -7,31 +7,31 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Assistant extends Utilisateur{
+public class Assistant extends Utilisateur {
     private ArrayList<Table> listTables;
 
-    public Assistant(String id){
+    public Assistant(String id) {
         super(id);
         listTables = new ArrayList<>();
     }
 
     @Override
     public Integer afficherPrincipal() {
-        return null;//pour le moment pas encore fait
+        return null;// pour le moment pas encore fait
     }
 
-    public void recupTables(){
+    public void recupTables() {
         try {
-            String url= "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn= DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
-            while(rs.next()) {
-                listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
+            while (rs.next()) {
+                listTables
+                        .add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
             }
             conn.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -51,7 +51,7 @@ public class Assistant extends Utilisateur{
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
-            if (!verifAssitant(rep)) {
+            if (!verif(rep, 2)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
@@ -61,18 +61,4 @@ public class Assistant extends Utilisateur{
         scan.close();
         return rep;
     }
-
-    /**
-     * Méthode pour vérifier que le choix de l'assistant est possible
-     *
-     * @param entree choix de l'assitant
-     * @return true si le choix existe et false sinon
-     */
-    public static Boolean verifAssitant(int entree) {
-        ArrayList<Integer> possibilite = new ArrayList<Integer>();
-        possibilite.add(0);
-        possibilite.add(1);
-        return possibilite.contains(entree);
-    }
-
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Cuisinier extends Utilisateur{
+public class Cuisinier extends Utilisateur {
 
-    public Cuisinier(String id){
+    public Cuisinier(String id) {
         super(id);
     }
 
@@ -25,7 +25,7 @@ public class Cuisinier extends Utilisateur{
                 + "2. Finir une commande" + n + "0. Se déconnecter" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
-            if (!verifCuisinier(rep)) {
+            if (!verif(rep, 3)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
@@ -34,19 +34,5 @@ public class Cuisinier extends Utilisateur{
         }
         scan.close();
         return rep;
-    }
-
-    /**
-     * Méthode pour vérifier que le choix du cuisinier est possible
-     *
-     * @param entree choix du cuisinier
-     * @return true si le choix existe et false sinon
-     */
-    public static Boolean verifCuisinier(int entree) {
-        ArrayList<Integer> possibilite = new ArrayList<Integer>();
-        possibilite.add(0);
-        possibilite.add(1);
-        possibilite.add(2);
-        return possibilite.contains(entree);
     }
 }
