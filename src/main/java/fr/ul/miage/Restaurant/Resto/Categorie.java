@@ -1,4 +1,4 @@
-package Restaurant.Resto;
+package fr.ul.miage.Restaurant.Resto;
 
 public class Categorie {
     private Integer idcategorie;

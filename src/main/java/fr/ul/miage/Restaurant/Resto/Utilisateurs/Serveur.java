@@ -1,7 +1,7 @@
-package Restaurant.Resto.Utilisateurs;
+package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import Restaurant.Resto.ColorText;
-import Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.ColorText;
+import fr.ul.miage.Restaurant.Resto.Table;
 
 import java.sql.*;
 import java.util.ArrayList;

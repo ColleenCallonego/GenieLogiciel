@@ -1,6 +1,6 @@
-package Restaurant.Resto;
+package fr.ul.miage.Restaurant.Resto;
 
-import Restaurant.Resto.Utilisateurs.Cuisinier;
+import fr.ul.miage.Restaurant.Resto.Utilisateurs.Cuisinier;
 
 public class Main {
 

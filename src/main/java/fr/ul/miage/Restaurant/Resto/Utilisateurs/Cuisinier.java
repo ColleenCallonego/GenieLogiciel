@@ -1,13 +1,13 @@
-package Restaurant.Resto.Utilisateurs;
+package fr.ul.miage.Restaurant.Resto.Utilisateurs;
+
+import fr.ul.miage.Restaurant.Resto.Categorie;
+import fr.ul.miage.Restaurant.Resto.Mp;
+import fr.ul.miage.Restaurant.Resto.Plat;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
-import Restaurant.Resto.Categorie;
-import Restaurant.Resto.Mp;
-import Restaurant.Resto.Plat;
 
 public class Cuisinier extends Utilisateur {
 

@@ -1,4 +1,4 @@
-package Restaurant.Resto.Utilisateurs;
+package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
 import java.util.ArrayList;
 

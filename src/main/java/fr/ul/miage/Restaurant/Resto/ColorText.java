@@ -1,4 +1,4 @@
-package Restaurant.Resto;
+package fr.ul.miage.Restaurant.Resto;
 
 public enum ColorText {
     COL_RESET("\u001B[0m"),//reset couleur texte
