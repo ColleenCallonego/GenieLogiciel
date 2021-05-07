@@ -1,1 +1,4 @@
 .vscode/settings.json
+.project
+.classpath
+Restaurant/Resto/.gitignore
