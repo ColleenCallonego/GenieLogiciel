@@ -46,7 +46,12 @@ public class Assistant extends Utilisateur {
             rep = -1;
         }
         scan.close();
-        return null;
+        if (rep != 0){
+            return rep-1;
+        }
+        else{
+            return rep;
+        }
     }
 
     public void recupTables() {
@@ -71,7 +76,7 @@ public class Assistant extends Utilisateur {
      * @param numero numéro de la table concernée
      * @return choix de l'assistant
      */
-    public static Integer EcranTableAssitant(Integer numero) {
+    public Integer EcranTableAssitant(Integer numero) {
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");

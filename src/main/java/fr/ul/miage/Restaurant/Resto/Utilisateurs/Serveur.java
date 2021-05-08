@@ -59,7 +59,13 @@ public class Serveur extends Utilisateur {
             rep = -1;
         }
         scan.close();
-        return rep;
+        if (rep != 0){
+            return rep-1;
+        }
+        else{
+            return rep;
+        }
+
     }
 
     private void colorerTable(Table table) {
@@ -88,7 +94,7 @@ public class Serveur extends Utilisateur {
      * @param table table sélectionnée
      * @return le choix du serveur
      */
-    public static Integer EcranTableServeur(Table table) {
+    public Integer EcranTableServeur(Table table) {
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
