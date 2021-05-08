@@ -59,7 +59,6 @@ public class Serveur extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
         if (rep > 0){
             return rep-1;
         }
@@ -102,7 +101,7 @@ public class Serveur extends Utilisateur {
      */
     public Integer EcranTableServeur(Table table) {
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+        Scanner scan2 = new Scanner(System.in);
         String n = System.getProperty("line.separator");
         System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
                 + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
@@ -110,7 +109,7 @@ public class Serveur extends Utilisateur {
                 + "1. Changer le status de la table" + n + "2. Ajouter un plat" + n + "3. Obtenir la facture" + n
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
-            rep = scan.nextInt();
+            rep = scan2.nextInt();
             if (!verif(rep, 4)) {
                 System.out.println("Entrée non valide");
             }
@@ -118,7 +117,6 @@ public class Serveur extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
         return rep;
     }
 }
