@@ -69,7 +69,7 @@ public class Main {
             String query = "SELECT * FROM utilisateur WHERE idutili='" + id + "' and mdp='" + mdp + "'";
             Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
             Statement st = conn.createStatement();
-            ResultSet rs = ((Statement) st).executeQuery(query);
+            ResultSet rs = (st).executeQuery(query);
             if (rs.next()) {
                 System.out.println("vous etes maintenant connecte en tant que: " + id);
                 userType = rs.getString("typeutili");
