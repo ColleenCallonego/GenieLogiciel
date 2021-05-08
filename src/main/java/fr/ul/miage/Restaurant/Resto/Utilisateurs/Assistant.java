@@ -42,18 +42,24 @@ public class Assistant extends Utilisateur {
             rep = scan.nextInt();
             if (!verif(rep, listTables.size() + 1)) {
                 System.out.println("Entrée non valide");
+                rep = -1;
             }
         } catch (InputMismatchException e) {
             System.out.println("Entrée non valide");
             rep = -1;
         }
         scan.close();
-        if (rep != 0){
+        if (rep > 0){
             return rep-1;
         }
         else{
             return rep;
         }
+    }
+
+    @Override
+    public void appelMethode(Integer num) {
+        EcranTableAssitant(num);
     }
 
     public void recupTables() {
