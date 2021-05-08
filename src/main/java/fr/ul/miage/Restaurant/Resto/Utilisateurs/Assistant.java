@@ -26,13 +26,13 @@ public class Assistant extends Utilisateur {
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
             if (table.getEtattable().equals("Débarrasée")){
-                System.out.println(ColorText.COL_RED + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[31m" + "[Table " + table.getNumero() + " ]" + "\u001B[0m");
             }
             else if (table.getEtattable().equals("Dressée")){
-                System.out.println(ColorText.COL_PURPLE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\033[0;35m" + "[Table " + table.getNumero() + " ]" + "\u001B[0m");
             }
             else{
-                System.out.println(ColorText.COL_BRIGHT_WHITE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[97m" + "[Table " + table.getNumero() + " ]" + "\u001B[0m");
             }
         }
         System.out.println("--------------------------------------" + n + "Bienvenue en salle, prêt à dresser ? " + n

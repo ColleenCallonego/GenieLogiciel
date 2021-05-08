@@ -43,7 +43,7 @@ public class Serveur extends Utilisateur {
                 colorerTable(table);
             }
             else{
-                System.out.println(ColorText.COL_BRIGHT_WHITE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[97m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
             }
         }
         System.out.println("--------------------------------------" + n + "Bienvenue en salle, prêt à servir ? " + n
@@ -77,19 +77,19 @@ public class Serveur extends Utilisateur {
     private void colorerTable(Table table) {
         switch(table.getEtattable()) {
             case "Libre":
-                System.out.println(ColorText.COL_GREEN + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[32m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Occupée":
-                System.out.println(ColorText.COL_YELLOW + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[33m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Débarrasée":
-                System.out.println(ColorText.COL_RED + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[31m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Réservée":
-                System.out.println(ColorText.COL_CYAN + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\u001B[36m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Dressée":
-                System.out.println(ColorText.COL_PURPLE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+                System.out.println("\033[0;35m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
         }
     }
