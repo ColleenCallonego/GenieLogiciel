@@ -48,20 +48,16 @@ public class Assistant extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        if (rep > 0){
-            return rep-1;
-        }
-        else{
-            return rep;
-        }
+        return rep;
     }
 
     @Override
     public void appelMethode(Integer num) {
-        EcranTableAssitant(num);
+        EcranTableAssitant(num - 1);
     }
 
     public void recupTables() {
+        listTables = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
             Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");

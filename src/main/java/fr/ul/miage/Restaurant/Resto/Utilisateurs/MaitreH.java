@@ -50,12 +50,13 @@ public class MaitreH extends Utilisateur {
     public void appelMethode(Integer num) {
         switch (num) {
             case 1:
-
+                affectationTable();
                 break;
         }
     }
 
     public void recupTables() {
+        listTables = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
             Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
@@ -72,6 +73,7 @@ public class MaitreH extends Utilisateur {
     }
 
     public void recupServeur() {
+        listServeur = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
             Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
@@ -96,7 +98,7 @@ public class MaitreH extends Utilisateur {
         String n = System.getProperty("line.separator");
         //afficher les table
         for (Table table : listTables){
-            System.out.println(ColorText.COL_BRIGHT_WHITE + "[Table " + table.getNumero() + " ]" + ColorText.COL_RESET);
+            System.out.println("\u001B[97m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
         }
         //demander de choisir une table
         System.out.println("--------------------------------------" + n + "Voici les différentes tables du restaurant" + n
@@ -140,7 +142,7 @@ public class MaitreH extends Utilisateur {
                 scan = new Scanner(System.in);
                 //afficher les serveurs
                 for (String serveur : listServeur){
-                    System.out.println(ColorText.COL_BRIGHT_WHITE + "[Table " + serveur + " ]" + ColorText.COL_RESET);
+                    System.out.println("\u001B[97m" + "[" + serveur + "]" + "\u001B[0m");
                 }
                 //demander de choisir un serveur
                 System.out.println("--------------------------------------" + n + "Voici les différentes serveurs du restaurant" + n
@@ -162,7 +164,8 @@ public class MaitreH extends Utilisateur {
                         String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
                         Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
                         Statement st = conn.createStatement();
-                        st.executeQuery("UPDATE table SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
+                        st.executeUpdate("UPDATE tableresto SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
+                        System.out.println("L'assignation a fonctionnée");
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }

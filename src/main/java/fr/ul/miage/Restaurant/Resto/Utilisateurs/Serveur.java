@@ -17,6 +17,7 @@ public class Serveur extends Utilisateur {
     }
 
     public void recupTables() {
+        listTables = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
             Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
@@ -59,18 +60,13 @@ public class Serveur extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        if (rep > 0){
-            return rep-1;
-        }
-        else{
-            return rep;
-        }
+        return rep;
 
     }
 
     @Override
     public void appelMethode(Integer num) {
-        EcranTableServeur(listTables.get(num));
+        EcranTableServeur(listTables.get(num - 1));
     }
 
     private void colorerTable(Table table) {
