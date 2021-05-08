@@ -52,7 +52,7 @@ public class Directeur extends Utilisateur {
     public void appelMethode(Integer num) {
         switch (num) {
             case 1:
-
+                gestionEmployes();
                 break;
             case 2:
                 gestionCarteDuJour();
@@ -73,6 +73,62 @@ public class Directeur extends Utilisateur {
             case 7:
 
                 break;
+        }
+    }
+
+    /**
+     * gere les employes
+     */
+    private void gestionEmployes() {
+        scan.reset();
+        System.out.println("Que souhaitez-vous faire ?\n0.retour\n1.ajouter un employer\n2.supprimer un employe");
+        int choice=scan.nextInt();
+        switch (choice){
+            case 0:break;
+            case 1:ajouterEmploye();break;
+            case 2:supprimerEmploye();break;
+
+        }
+    }
+
+    private void supprimerEmploye() {
+        scan.reset();
+        System.out.println("id de l'employe ?");
+        String name = scan.next();
+
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            String query = "DELETE FROM utilisateur WHERE idutili='"+name+"'";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+
+            conn.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+
+    private void ajouterEmploye() {
+        scan.reset();
+        System.out.println("id de l'employe ?");
+        String name = scan.next();
+        System.out.println("mdp ?");
+        String mdp = scan.next();
+        System.out.println("type/fonction ?");
+        String type = scan.next();
+
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp+ "','"+type+"')";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+
+            conn.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
