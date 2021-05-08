@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class Serveur extends Utilisateur {
     private ArrayList<Table> listTables;
@@ -36,7 +37,7 @@ public class Serveur extends Utilisateur {
     public Integer afficherPrincipal() {
         recupTables();
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
             if (table.getServer().equals(id)){
@@ -58,7 +59,7 @@ public class Serveur extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
+
         return rep;
     }
 
@@ -90,7 +91,7 @@ public class Serveur extends Utilisateur {
      */
     public static Integer EcranTableServeur(Table table) {
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+
         String n = System.getProperty("line.separator");
         System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
                 + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
@@ -106,7 +107,7 @@ public class Serveur extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
+
         return rep;
     }
 }

@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class Cuisinier extends Utilisateur {
 
@@ -23,7 +24,7 @@ public class Cuisinier extends Utilisateur {
     @Override
     public Integer afficherPrincipal() {
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+
         String n = System.getProperty("line.separator");
         System.out.println("--------------------------------------" + n + "Bienvenue dans la cuisine " + n
                 + "--------------------------------------" + n + "1. Définir un nouveau plat" + n
@@ -37,7 +38,7 @@ public class Cuisinier extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
+
         return rep;
     }
 

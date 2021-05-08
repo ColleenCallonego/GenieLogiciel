@@ -2,6 +2,7 @@ package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class MaitreH extends Utilisateur {
 
@@ -17,7 +18,7 @@ public class MaitreH extends Utilisateur {
     @Override
     public Integer afficherPrincipal() {
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+
         String n = System.getProperty("line.separator");
         System.out.println("--------------------------------------" + n + "Bienvenue M. le Maitre d'Hôtel " + n
                 + "--------------------------------------" + n + "1. Affecter un serveur à une table" + n
@@ -31,7 +32,7 @@ public class MaitreH extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
+
         return rep;
     }
 }
