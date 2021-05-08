@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import static fr.ul.miage.Restaurant.Resto.Main.scan;
+
 public class Assistant extends Utilisateur {
     private ArrayList<Table> listTables;
 
@@ -20,7 +22,7 @@ public class Assistant extends Utilisateur {
     public Integer afficherPrincipal() {
         recupTables();
         int rep = -1;
-        Scanner scan = new Scanner(System.in);
+
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
             if (table.getEtattable().equals("Débarrasée")){

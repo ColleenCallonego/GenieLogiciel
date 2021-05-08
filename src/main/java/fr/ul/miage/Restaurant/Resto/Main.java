@@ -9,6 +9,7 @@ public class Main {
 
     static String userType;
     static String userId;
+    public static Scanner scan=new Scanner(System.in);
 
     public static void main(String[] args) {
 
@@ -34,21 +35,26 @@ public class Main {
                 throw new IllegalStateException("Unexpected value: " + userType);
         }
 
-        u.afficherPrincipal();
+        int answer;
+        do{
+            answer=u.afficherPrincipal();
 
+        }while(answer!=0);
+
+    scan.close();
 
 
 
     }
 
     private static void Connexion() {
-        Scanner s = new Scanner(System.in);
+
         String id, mdp;
         do {
             System.out.println("Saisissez votre identifiant:");
-            id = s.nextLine();
+            id = scan.nextLine();
             System.out.println("Saisissez votre mot de passe:");
-            mdp = s.nextLine();
+            mdp = scan.nextLine();
 
         } while (!identification(id, mdp));
 
