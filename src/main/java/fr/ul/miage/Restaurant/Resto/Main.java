@@ -38,7 +38,9 @@ public class Main {
         int answer;
         do{
             answer=u.afficherPrincipal();
-
+            if (answer > 0){
+                u.appelMethode(answer);
+            }
         }while(answer!=0);
 
     scan.close();

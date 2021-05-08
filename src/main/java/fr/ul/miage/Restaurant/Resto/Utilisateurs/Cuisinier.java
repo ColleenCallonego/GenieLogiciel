@@ -33,6 +33,7 @@ public class Cuisinier extends Utilisateur {
             rep = scan.nextInt();
             if (!verif(rep, 3)) {
                 System.out.println("Entrée non valide");
+                rep = -1;
             }
         } catch (InputMismatchException e) {
             System.out.println("Entrée non valide");
@@ -40,6 +41,18 @@ public class Cuisinier extends Utilisateur {
         }
 
         return rep;
+    }
+
+    @Override
+    public void appelMethode(Integer num) {
+        switch (num) {
+            case 1:
+                definitionPlat();
+                break;
+            case 2:
+
+                break;
+        }
     }
 
     public void definitionPlat() {

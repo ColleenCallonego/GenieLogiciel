@@ -36,6 +36,7 @@ public class MaitreH extends Utilisateur {
             rep = scan.nextInt();
             if (!verif(rep, 2)) {
                 System.out.println("Entrée non valide");
+                rep = -1;
             }
         } catch (InputMismatchException e) {
             System.out.println("Entrée non valide");
@@ -43,6 +44,15 @@ public class MaitreH extends Utilisateur {
         }
 
         return rep;
+    }
+
+    @Override
+    public void appelMethode(Integer num) {
+        switch (num) {
+            case 1:
+
+                break;
+        }
     }
 
     public void recupTables() {

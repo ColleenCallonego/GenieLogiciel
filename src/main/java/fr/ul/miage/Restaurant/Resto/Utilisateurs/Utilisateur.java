@@ -11,6 +11,8 @@ public abstract class Utilisateur {
 
     public abstract Integer afficherPrincipal();
 
+    public abstract void appelMethode(Integer num);
+
     public static Boolean verif(int entree, int nbChoix) {
         ArrayList<Integer> possibilite = new ArrayList<Integer>();
         for (int i = 0; i < nbChoix; i++) {
