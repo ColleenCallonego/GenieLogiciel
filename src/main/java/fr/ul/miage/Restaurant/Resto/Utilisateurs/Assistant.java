@@ -48,7 +48,6 @@ public class Assistant extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
         if (rep > 0){
             return rep-1;
         }
@@ -100,7 +99,6 @@ public class Assistant extends Utilisateur {
             System.out.println("Entrée non valide");
             rep = -1;
         }
-        scan.close();
         return rep;
     }
 }
