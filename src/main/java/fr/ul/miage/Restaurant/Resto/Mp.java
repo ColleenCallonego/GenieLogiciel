@@ -11,6 +11,11 @@ public class Mp {
         this.stockmp = stockmp;
     }
 
+    public Mp(int anInt, int anInt1) {
+        this.idmp = idmp;
+        this.stockmp = stockmp;
+    }
+
     public Integer getIdmp() {
         return this.idmp;
     }
