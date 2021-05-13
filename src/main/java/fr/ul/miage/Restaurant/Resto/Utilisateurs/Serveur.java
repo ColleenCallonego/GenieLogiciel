@@ -5,6 +5,7 @@ import fr.ul.miage.Restaurant.Resto.Table;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -114,5 +115,59 @@ public class Serveur extends Utilisateur {
             rep = -1;
         }
         return rep;
+    }
+
+    public void InsererPlat(Connection conn,Integer numeroTable, Integer plat){
+        Integer idCommande = getIdCommande(conn, numeroTable);
+        if (idCommande == -1){
+            creerCommande(conn, numeroTable);
+            idCommande = getIdCommande(conn, numeroTable);
+        }
+        insererSousCommande(conn, plat, idCommande);
+    }
+
+    public void insererSousCommande(Connection conn, Integer plat, Integer commande){
+        try {
+            java.util.Date d = new Date();
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO souscommande(heurecommande, etatsouscommande, plat, commande)VALUES ('" + d + "', 'commande', '" + plat + "', '" + commande + "')";
+            Integer status = st.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void creerCommande(Connection conn, Integer num) {
+        try {
+            java.util.Date d = new Date();
+            String service;
+            if (d.getHours() < 15){
+                service = "Dejeuner";
+            }
+            else{
+                service = "Diner";
+            }
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO commande(datecommande, service, statuscommande, tableresto)VALUES ('" + d + "', '" + service + "', 'En cours', '" + num + "')";
+            Integer status = st.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Integer getIdCommande (Connection conn, Integer table){
+        try {
+            Statement st = conn.createStatement();
+            String sql = "SELECT numerocommande FROM commande WHERE tableresto = '" + table + "' AND statuscommande = 'En cours'";
+            ResultSet rs = st.executeQuery(sql);
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
