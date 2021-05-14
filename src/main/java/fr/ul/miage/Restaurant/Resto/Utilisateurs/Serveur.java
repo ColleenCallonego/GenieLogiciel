@@ -116,7 +116,7 @@ public class Serveur extends Utilisateur {
 
                 break;
             case 2:
-                ajouterPlat();
+                ajouterPlat(num);
                 break;
             case 3:
 
@@ -315,7 +315,7 @@ public class Serveur extends Utilisateur {
         }
     }
 
-    private void ajouterPlat() {
+    private void ajouterPlat(int numTable) {
         int rep = -1;
         Scanner scan2 = new Scanner(System.in);
         String n = System.getProperty("line.separator");
@@ -365,11 +365,29 @@ public class Serveur extends Utilisateur {
             }
             if (rep > 0){
                 platChoisi = listePlats.get(rep-1);
-                //fonction de colleen
+                InsererPlat(connect(), numTable, platChoisi.getIdplat());
             }
             System.out.println("Opération annulée");
         }
         System.out.println("Opération annulée");
+    }
+
+    /**
+     * Méthode pour se connecter à la base de donnée
+     *
+     * @return la connection à la base
+     */
+    public Connection connect() {
+        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+        String user = "m1user1_03";
+        String password = "m1user1_03";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return conn;
     }
 
 }
