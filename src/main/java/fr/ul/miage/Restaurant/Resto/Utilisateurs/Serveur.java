@@ -2,13 +2,14 @@ package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
 import fr.ul.miage.Restaurant.Resto.Categorie;
 import fr.ul.miage.Restaurant.Resto.ColorText;
+import fr.ul.miage.Restaurant.Resto.Mp;
 import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.Table;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Serveur extends Utilisateur {
@@ -169,6 +170,149 @@ public class Serveur extends Utilisateur {
             rep = -1;
         }
         return rep;
+    }
+
+    public void InsererPlat(Connection conn,Integer numeroTable, Integer plat){
+        Integer idCommande = getIdCommande(conn, numeroTable);
+        if (idCommande == -1){
+            creerCommande(conn, numeroTable);
+            idCommande = getIdCommande(conn, numeroTable);
+        }
+        insererSousCommande(conn, plat, idCommande);
+        modifierStockMP(conn, plat);
+    }
+
+    /**
+     * Méthode pour modifier le stock de matière première d'un plat
+     * @param conn connection à la base
+     * @param plat plat concerné
+     */
+    public void modifierStockMP(Connection conn, Integer plat){
+        try {
+            ArrayList<Mp> listMpsPlat = getInfoMpPlat(conn, plat);
+            ArrayList<Mp> listInfoMps = getInfoMp(conn, listMpsPlat);
+            for (Mp mp : listInfoMps) {
+                for (Mp mpPlat : listMpsPlat) {
+                    if (mp.getIdmp() == mpPlat.getIdmp()) {
+                        Integer newStock = mp.getStockmp() - mpPlat.getStockmp();
+                        Statement st = conn.createStatement();
+                        String sql = "UPDATE mp SET stockmp = " + newStock + "WHERE idmp = " + mp.getIdmp();
+                        Integer status = st.executeUpdate(sql);
+                    }
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Méthode pour récupérer les matières premières d'un plat donné
+     * @param conn connection à la base
+     * @param plat plat concerné
+     * @return une liste de matière première présente dans le plat
+     */
+    public ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat){
+        try {
+            ArrayList<Mp> list = new ArrayList<Mp>();
+            Statement st = conn.createStatement();
+            String sql = "SELECT mp, quantite FROM plat_mp WHERE plat = '" + plat + "'";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()){
+                list.add(new Mp(rs.getInt(1), rs.getInt(2)));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Méthode pour récuperer le stock du matière première
+     * @param conn connection à la base
+     * @param mps liste de matière première
+     * @return une liste avec les infos des matières premières
+     */
+    public ArrayList<Mp> getInfoMp(Connection conn, ArrayList<Mp> mps){
+        try {
+            ArrayList<Mp> list = new ArrayList<Mp>();
+            for(Mp mp : mps){
+                Statement st = conn.createStatement();
+                String sql = "SELECT idmp, stockmp FROM mp WHERE idmp = '" + mp.getIdmp() + "'";
+                ResultSet rs = st.executeQuery(sql);
+                while (rs.next()){
+                    list.add(new Mp(rs.getInt(1), rs.getInt(2)));
+                }
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Méthode pour insérer une sous-commande (un plat) lié à une commande donnée
+     * @param conn connection à la base
+     * @param plat plat à ajouter
+     * @param commande commande concernée
+     */
+    public void insererSousCommande(Connection conn, Integer plat, Integer commande){
+        try {
+            java.util.Date d = new Date();
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO souscommande(heurecommande, etatsouscommande, plat, commande)VALUES ('" + d + "', 'commande', '" + plat + "', '" + commande + "')";
+            Integer status = st.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Méthode pour créer une commande
+     * @param conn connection à la base
+     * @param num numéro de la table liée à la commande
+     */
+    public void creerCommande(Connection conn, Integer num) {
+        try {
+            java.util.Date d = new Date();
+            String service;
+            if (d.getHours() < 15){
+                service = "Dejeuner";
+            }
+            else{
+                service = "Diner";
+            }
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO commande(datecommande, service, statuscommande, tableresto)VALUES ('" + d + "', '" + service + "', 'En cours', '" + num + "')";
+            Integer status = st.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Méthode pour obtenir l'identifiant d'une commande liée à une table
+     * @param conn connection à la base
+     * @param table numéro de la table concerné
+     * @return le numéro de la table si une commande en cours pour cette table existe, -1 sinon
+     */
+    public Integer getIdCommande (Connection conn, Integer table){
+        try {
+            Statement st = conn.createStatement();
+            String sql = "SELECT numerocommande FROM commande WHERE tableresto = '" + table + "' AND statuscommande = 'En cours'";
+            ResultSet rs = st.executeQuery(sql);
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void ajouterPlat() {
