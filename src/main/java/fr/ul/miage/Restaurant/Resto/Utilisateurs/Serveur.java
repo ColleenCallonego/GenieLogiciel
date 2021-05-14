@@ -113,16 +113,22 @@ public class Serveur extends Utilisateur {
                 System.out.println("Retour à la page principale");
                 break;
             case 1:
-
+                changerEtatTable();
                 break;
             case 2:
                 ajouterPlat(num);
                 break;
             case 3:
-
+                imprimerFacture();
                 break;
 
         }
+    }
+
+    private void changerEtatTable() {
+    }
+
+    private void imprimerFacture() {
     }
 
     private void colorerTable(Table table) {
