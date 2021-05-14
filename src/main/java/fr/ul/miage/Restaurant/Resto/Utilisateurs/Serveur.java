@@ -1,11 +1,14 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
+import fr.ul.miage.Restaurant.Resto.Categorie;
 import fr.ul.miage.Restaurant.Resto.ColorText;
+import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.Table;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Serveur extends Utilisateur {
@@ -31,6 +34,43 @@ public class Serveur extends Utilisateur {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Categorie> recupCategories() {
+        ArrayList<Categorie> listCategories = new ArrayList<>();
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM categorie");
+            while(rs.next()) {
+                listCategories.add(new Categorie(rs.getInt(1), rs.getString(2)));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listCategories;
+    }
+
+    public ArrayList<Plat> recupPlats(int idCategorie) {
+        ArrayList<Plat> listPlats = new ArrayList<>();
+        Date dateJour = new Date();
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT plat.idplat, plat.nomplat, plat.prixplat FROM plat JOIN cartejour_plat ON cartejour_plat.plat = plat.idplat JOIN cartedujour ON cartedujour.idcartedujour = cartejour_plat.carte AND cartedujour.datecartejour = '" + dateJour + "' AND plat.cat =" + idCategorie);
+            while(rs.next()) {
+                listPlats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3)));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listPlats;
     }
 
     @Override
@@ -66,7 +106,22 @@ public class Serveur extends Utilisateur {
 
     @Override
     public void appelMethode(Integer num) {
-        EcranTableServeur(listTables.get(num - 1));
+        int actionTable = EcranTableServeur(listTables.get(num - 1));
+        switch (actionTable){
+            case 0:
+                System.out.println("Retour à la page principale");
+                break;
+            case 1:
+
+                break;
+            case 2:
+                ajouterPlat();
+                break;
+            case 3:
+
+                break;
+
+        }
     }
 
     private void colorerTable(Table table) {
@@ -115,4 +170,62 @@ public class Serveur extends Utilisateur {
         }
         return rep;
     }
+
+    private void ajouterPlat() {
+        int rep = -1;
+        Scanner scan2 = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+
+        ArrayList<Categorie> listCategories;
+        ArrayList<Plat> listePlats;
+        Categorie categorieChoisie;
+        Plat platChoisi;
+        System.out.println("Nos catégories de plats :");
+        listCategories = recupCategories();
+        for (Categorie categorie : listCategories){
+            System.out.println("\u001B[97m" + "[" + categorie.getNomcategorie() + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Voici les différentes catégories de plats du restaurant" + n
+                + "--------------------------------------" + n + "1-" + listCategories.size() + ". Selectionner une catégorie"
+                + n + "0. Annuler");
+        try {
+            rep = scan2.nextInt();
+            if (!verif(rep, listCategories.size()+1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0){
+            categorieChoisie = listCategories.get(rep-1);
+            rep = -1;
+            listePlats = recupPlats(categorieChoisie.getIdcategorie());
+            System.out.println("Nos plats");
+            for (Plat plat : listePlats){
+                System.out.println("\u001B[97m" + "[" + plat.getNomplat() + " à " + plat.getPrixplat() + "]" + "\u001B[0m");
+            }
+            System.out.println("--------------------------------------" + n + "Voici les différentes plats du restaurant" + n
+                    + "--------------------------------------" + n + "1-" + listePlats.size() + ". Selectionner un plat"
+                    + n + "0. Annuler");
+            try {
+                rep = scan2.nextInt();
+                if (!verif(rep, listePlats.size()+1)) {
+                    System.out.println("Entrée non valide");
+                    rep = -1;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+            if (rep > 0){
+                platChoisi = listePlats.get(rep-1);
+                //fonction de colleen
+            }
+            System.out.println("Opération annulée");
+        }
+        System.out.println("Opération annulée");
+    }
+
 }

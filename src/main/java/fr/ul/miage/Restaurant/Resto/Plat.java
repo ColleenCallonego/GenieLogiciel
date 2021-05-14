@@ -13,6 +13,12 @@ public class Plat {
         this.cat = cat;
     }
 
+    public Plat(int idplat, String nomplat, int prixplat) {
+        this.idplat = idplat;
+        this.nomplat = nomplat;
+        this.prixplat = prixplat;
+    }
+
     public Integer getIdplat() {
         return this.idplat;
     }
