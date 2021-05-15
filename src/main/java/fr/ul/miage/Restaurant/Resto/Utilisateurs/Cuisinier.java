@@ -3,6 +3,7 @@ package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 import fr.ul.miage.Restaurant.Resto.Categorie;
 import fr.ul.miage.Restaurant.Resto.Mp;
 import fr.ul.miage.Restaurant.Resto.Plat;
+import fr.ul.miage.Restaurant.Resto.SousCommande;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -341,5 +342,96 @@ public class Cuisinier extends Utilisateur {
             System.out.println(e.getMessage());
         }
         return conn;
+    }
+
+    /**
+     * Méthode pour afficher les deux listes d'attentes en cuisine
+     * @param conn connection à la base
+     * @return le numero de la sous commandde qui a été préparer ou -1 si la saisie est incorrecte
+     */
+    public Integer afficherListesAttentes(Connection conn){
+        Integer rep;
+        ArrayList<SousCommande> enfants = getListeAttenteEnfant(conn);
+        ArrayList<SousCommande> normaux = getListeAttente(conn);
+        System.out.println("Voici la liste d'attente des menus enfants (prioritaire)");
+        for(SousCommande sscom : enfants){
+            System.out.println(sscom);
+        }
+        System.out.println("Voici la liste d'attente des plats (non prioritaire)");
+        for(SousCommande sscom : normaux){
+            System.out.println(sscom);
+        }
+        System.out.println("Quelle commande avez vous préparez ? (Entrez son numéro)");
+        try{
+            Scanner s = new Scanner(System.in);
+            rep = s.nextInt();
+            Boolean bonneRep = false;
+            String list = "Enfants";
+            Integer i = 0;
+            ArrayList<SousCommande> fusion = enfants;
+            fusion.addAll(normaux);
+            if (verifNum(rep, fusion)){
+                return rep;
+            }
+            else{
+                System.out.println("Numéro non valide");
+                return -1;
+            }
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Numéro non valide");
+            return -1;
+        }
+    }
+
+    /**
+     * Méthode pour vérifier le numéro d'une sous-commande
+     * @param num numéro rentré par le cuisinier
+     * @param sscoms liste de toute les commandes possibles
+     * @return true si le numéro existe dans la liste, false sinon
+     */
+    public boolean verifNum(Integer num, ArrayList<SousCommande> sscoms) {
+        for (SousCommande com : sscoms) {
+            if (com.sameNum(num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Méthode pour obtenir la liste d'attente des plats normaux
+     * @param conn connection à la base
+     */
+    public ArrayList<SousCommande> getListeAttente(Connection conn){
+        ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
+        try {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
+            while (rs.next()) {
+                sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sscommandes;
+    }
+
+    /**
+     * Méthode pour obtenir la liste d'attente des plats pour enfants
+     * @param conn connection à la base
+     */
+    public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn){
+        ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
+        try {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat = 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
+            while (rs.next()) {
+                sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sscommandes;
     }
 }

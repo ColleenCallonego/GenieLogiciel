@@ -1,4 +1,5 @@
 import fr.ul.miage.Restaurant.Resto.Plat;
+import fr.ul.miage.Restaurant.Resto.SousCommande;
 import fr.ul.miage.Restaurant.Resto.Utilisateurs.Cuisinier;
 import org.junit.jupiter.api.Test;
 
@@ -33,4 +34,19 @@ public class TestCuisinier {
         assertNotNull(c.connect());
     }
 
+    @Test
+    void testVerifNumSame(){
+        Cuisinier c = new Cuisinier("PontTi");
+        ArrayList<SousCommande> list = new ArrayList<SousCommande>();
+        list.add(new SousCommande(1, "Frites"));
+        assertEquals(true, c.verifNum(1, list));
+    }
+
+    @Test
+    void testVerifNumNotSame(){
+        Cuisinier c = new Cuisinier("PontTi");
+        ArrayList<SousCommande> list = new ArrayList<SousCommande>();
+        list.add(new SousCommande(1, "Frites"));
+        assertEquals(false, c.verifNum(5, list));
+    }
 }
