@@ -58,7 +58,7 @@ public class Cuisinier extends Utilisateur {
     }
 
     public void finalisationCommande() {
-        Connection conn = connect();
+        Connection conn = GestionBDD.connect();
         int idCommande;
         do {
             idCommande = afficherListesAttentes(conn);
@@ -71,7 +71,7 @@ public class Cuisinier extends Utilisateur {
     public void definitionPlat() {
         try {
             String nomPlat = "";
-            Connection conn = connect();
+            Connection conn = GestionBDD.connect();
             // Visualisation des plats déjà présents
             ArrayList<Plat> plats = getPlats(conn);
             if (plats.isEmpty()) {
@@ -210,14 +210,9 @@ public class Cuisinier extends Utilisateur {
      * @param quantite
      */
     public void insererPlat_mp(Connection conn, Integer idPlat, Integer idMp, Integer quantite) {
-        try {
-            Statement st = conn.createStatement();
-            String sql = "INSERT INTO plat_mp(plat, mp, quantite)VALUES ('" + idPlat + "',' " + idMp + "',' " + quantite
-                    + "')";
-            Integer status = st.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String sql = "INSERT INTO plat_mp(plat, mp, quantite)VALUES ('" + idPlat + "',' " + idMp + "',' " + quantite
+                + "')";
+        GestionBDD.executeUpdate(conn,sql);
     }
 
     /**
@@ -245,15 +240,11 @@ public class Cuisinier extends Utilisateur {
      * @param idCat
      */
     public void insererPlat(Connection conn, String nom, Integer prix, Integer idCat) {
-        try {
-            System.out.println(nom + " " + prix + " " + idCat);
-            Statement st = conn.createStatement();
-            String sql = "INSERT INTO plat(nomplat, prixplat, cat)VALUES ('" + nom + "',' " + prix + "',' " + idCat
-                    + "')";
-            Integer status = st.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        System.out.println(nom + " " + prix + " " + idCat);
+
+        String sql = "INSERT INTO plat(nomplat, prixplat, cat)VALUES ('" + nom + "',' " + prix + "',' " + idCat
+                + "')";
+        GestionBDD.executeUpdate(conn,sql);
     }
 
     /**
@@ -265,9 +256,9 @@ public class Cuisinier extends Utilisateur {
      */
     public Integer getIdPlat(Connection conn, String nom) {
         try {
-            Statement st = conn.createStatement();
+
             String sql = "SELECT idplat FROM plat WHERE nomplat = '" + nom + "'";
-            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs = GestionBDD.executeSelect(conn,sql);
             rs.next();
             return rs.getInt(1);
         } catch (SQLException e) {
@@ -285,8 +276,8 @@ public class Cuisinier extends Utilisateur {
     public ArrayList<Categorie> getCategories(Connection conn) {
         ArrayList<Categorie> cats = new ArrayList<Categorie>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM categorie");
+
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM categorie");
             while (rs.next()) {
                 cats.add(new Categorie(rs.getInt(1), rs.getString(2)));
             }
@@ -305,8 +296,8 @@ public class Cuisinier extends Utilisateur {
     public ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(
+
+            ResultSet rs = GestionBDD.executeSelect(conn,
                     "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie");
             while (rs.next()) {
                 plats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getString(4)));
@@ -327,8 +318,8 @@ public class Cuisinier extends Utilisateur {
     public ArrayList<Mp> getMPs(Connection conn) {
         ArrayList<Mp> mps = new ArrayList<Mp>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM mp");
+
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM mp");
             while (rs.next()) {
                 mps.add(new Mp(rs.getInt(1), rs.getString(2), rs.getInt(3)));
             }
@@ -338,23 +329,7 @@ public class Cuisinier extends Utilisateur {
         return mps;
     }
 
-    /**
-     * Méthode pour se connecter à la base de donnée
-     * 
-     * @return la connection à la base
-     */
-    public Connection connect() {
-        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-        String user = "m1user1_03";
-        String password = "m1user1_03";
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
-    }
+
 
     /**
      * Méthode pour afficher les deux listes d'attentes en cuisine
@@ -418,8 +393,8 @@ public class Cuisinier extends Utilisateur {
     public ArrayList<SousCommande> getListeAttente(Connection conn){
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
+
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
             while (rs.next()) {
                 sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
             }
@@ -436,8 +411,8 @@ public class Cuisinier extends Utilisateur {
     public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn){
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat = 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
+
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat = 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
             while (rs.next()) {
                 sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
             }

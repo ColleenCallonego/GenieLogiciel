@@ -3,6 +3,11 @@ package fr.ul.miage.Restaurant.Resto.misc;
 import java.sql.*;
 
 public class GestionBDD {
+    /**
+     * Méthode pour se connecter à la base de donnée
+     *
+     * @return la connection à la base
+     */
     public static Connection connect() {
         String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
         String user = "m1user1_03";
@@ -16,6 +21,11 @@ public class GestionBDD {
         return conn;
     }
 
+    /**
+     * Méthode pour executer des requetes de type SELECT
+     *
+     * @return l'ensemble des resultats de la requete
+     */
     public  static ResultSet executeSelect(Connection conn, String query){
         try {
             Statement st = conn.createStatement();
@@ -27,6 +37,11 @@ public class GestionBDD {
         }
     }
 
+    /**
+     * Méthode pour executer des requetes de type UPDATE
+     *
+     *
+     */
     public static void executeUpdate(Connection conn, String query){
         try {
             Statement st = conn.createStatement();
