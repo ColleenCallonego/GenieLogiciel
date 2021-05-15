@@ -113,7 +113,7 @@ public class Serveur extends Utilisateur {
                 System.out.println("Retour à la page principale");
                 break;
             case 1:
-                changerEtatTable();
+                changerEtatTable(num);
                 break;
             case 2:
                 ajouterPlat(num);
@@ -121,11 +121,65 @@ public class Serveur extends Utilisateur {
             case 3:
                 imprimerFacture();
                 break;
-
         }
     }
 
-    private void changerEtatTable() {
+    private void changerEtatTable(int numTable) {
+        ArrayList<String> listeEtat = new ArrayList<>();
+        //recuperer l'etat
+        String etatActuel = listTables.get(numTable-1).getEtattable();
+        if (etatActuel.equals("Libre")){
+            listeEtat.add("Occupée");
+            listeEtat.add("Réservée");
+        }
+        if (etatActuel.equals("Réservée")){
+            listeEtat.add("Occupée");
+            listeEtat.add("Libre");
+        }
+        if (etatActuel.equals("Occupée")){
+            listeEtat.add("Débarrasée");
+        }
+        //faire le choix du nouvel etat
+        int rep = -1;
+        Scanner scan = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+        for (String etat : listeEtat){
+            System.out.println("\u001B[97m" + "[" + etat + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Changer l'état de la table" + n
+                + "--------------------------------------");
+        if (listeEtat.size() != 0){
+            System.out.println("1-" + listeEtat.size() + ". Selectionner un état");
+        }
+        System.out.println("0. Annuler" + n + n + n + "Que voulez vous faire?");
+        try {
+            rep = scan.nextInt();
+            if (!verif(rep, listeEtat.size() + 1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0){
+            //changer l'état dans la base
+            String nouvelEtat = listeEtat.get(rep-1);
+            try{
+                String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+                Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+                Statement st = conn.createStatement();
+                st.executeUpdate("UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+                System.out.println("La modification a fonctionnée");
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            System.out.println("Modification annulée");
+        }
+
     }
 
     private void imprimerFacture() {
