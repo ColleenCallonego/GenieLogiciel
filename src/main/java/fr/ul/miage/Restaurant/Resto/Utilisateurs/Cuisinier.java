@@ -4,6 +4,7 @@ import fr.ul.miage.Restaurant.Resto.Categorie;
 import fr.ul.miage.Restaurant.Resto.Mp;
 import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.SousCommande;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -51,9 +52,20 @@ public class Cuisinier extends Utilisateur {
                 definitionPlat();
                 break;
             case 2:
-
+                finalisationCommande();
                 break;
         }
+    }
+
+    public void finalisationCommande() {
+        Connection conn = connect();
+        int idCommande;
+        do {
+            idCommande = afficherListesAttentes(conn);
+        }while (idCommande == -1);
+        String query ="UPDATE souscommande SET etatsouscommande = 'prepare' WHERE idsouscommande = '"+idCommande+"'";
+        GestionBDD.executeUpdate(conn,query);
+
     }
 
     public void definitionPlat() {
