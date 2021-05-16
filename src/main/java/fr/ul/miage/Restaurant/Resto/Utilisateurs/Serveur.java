@@ -427,9 +427,13 @@ public class Serveur extends Utilisateur {
                 platChoisi = listePlats.get(rep-1);
                 InsererPlat(connect(), numTable, platChoisi.getIdplat());
             }
+            else{
+                System.out.println("Opération annulée");
+            }
+        }
+        else{
             System.out.println("Opération annulée");
         }
-        System.out.println("Opération annulée");
     }
 
     /**
