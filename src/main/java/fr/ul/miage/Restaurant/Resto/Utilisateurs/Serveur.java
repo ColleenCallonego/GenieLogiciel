@@ -1,7 +1,9 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
+import fr.ul.miage.Restaurant.Resto.Categorie;
 import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Mp;
+import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.Table;
 
 import java.sql.*;
@@ -33,6 +35,43 @@ public class Serveur extends Utilisateur {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Categorie> recupCategories() {
+        ArrayList<Categorie> listCategories = new ArrayList<>();
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM categorie");
+            while(rs.next()) {
+                listCategories.add(new Categorie(rs.getInt(1), rs.getString(2)));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listCategories;
+    }
+
+    public ArrayList<Plat> recupPlats(int idCategorie) {
+        ArrayList<Plat> listPlats = new ArrayList<>();
+        Date dateJour = new Date();
+        try {
+            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT plat.idplat, plat.nomplat, plat.prixplat FROM plat JOIN cartejour_plat ON cartejour_plat.plat = plat.idplat JOIN cartedujour ON cartedujour.idcartedujour = cartejour_plat.carte AND cartedujour.datecartejour = '" + dateJour + "' AND plat.cat =" + idCategorie);
+            while(rs.next()) {
+                listPlats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3)));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listPlats;
     }
 
     @Override
@@ -68,7 +107,82 @@ public class Serveur extends Utilisateur {
 
     @Override
     public void appelMethode(Integer num) {
-        EcranTableServeur(listTables.get(num - 1));
+        int actionTable = EcranTableServeur(listTables.get(num - 1));
+        switch (actionTable){
+            case 0:
+                System.out.println("Retour à la page principale");
+                break;
+            case 1:
+                changerEtatTable(num);
+                break;
+            case 2:
+                ajouterPlat(num);
+                break;
+            case 3:
+                imprimerFacture();
+                break;
+        }
+    }
+
+    private void changerEtatTable(int numTable) {
+        ArrayList<String> listeEtat = new ArrayList<>();
+        //recuperer l'etat
+        String etatActuel = listTables.get(numTable-1).getEtattable();
+        if (etatActuel.equals("Libre")){
+            listeEtat.add("Occupée");
+            listeEtat.add("Réservée");
+        }
+        if (etatActuel.equals("Réservée")){
+            listeEtat.add("Occupée");
+            listeEtat.add("Libre");
+        }
+        if (etatActuel.equals("Occupée")){
+            listeEtat.add("Débarrasée");
+        }
+        //faire le choix du nouvel etat
+        int rep = -1;
+        Scanner scan = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+        for (String etat : listeEtat){
+            System.out.println("\u001B[97m" + "[" + etat + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Changer l'état de la table" + n
+                + "--------------------------------------");
+        if (listeEtat.size() != 0){
+            System.out.println("1-" + listeEtat.size() + ". Selectionner un état");
+        }
+        System.out.println("0. Annuler" + n + n + n + "Que voulez vous faire?");
+        try {
+            rep = scan.nextInt();
+            if (!verif(rep, listeEtat.size() + 1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0){
+            //changer l'état dans la base
+            String nouvelEtat = listeEtat.get(rep-1);
+            try{
+                String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+                Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+                Statement st = conn.createStatement();
+                st.executeUpdate("UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+                System.out.println("La modification a fonctionnée");
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            System.out.println("Modification annulée");
+        }
+
+    }
+
+    private void imprimerFacture() {
     }
 
     private void colorerTable(Table table) {
@@ -260,4 +374,80 @@ public class Serveur extends Utilisateur {
             return null;
         }
     }
+
+    private void ajouterPlat(int numTable) {
+        int rep = -1;
+        Scanner scan2 = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+
+        ArrayList<Categorie> listCategories;
+        ArrayList<Plat> listePlats;
+        Categorie categorieChoisie;
+        Plat platChoisi;
+        System.out.println("Nos catégories de plats :");
+        listCategories = recupCategories();
+        for (Categorie categorie : listCategories){
+            System.out.println("\u001B[97m" + "[" + categorie.getNomcategorie() + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Voici les différentes catégories de plats du restaurant" + n
+                + "--------------------------------------" + n + "1-" + listCategories.size() + ". Selectionner une catégorie"
+                + n + "0. Annuler");
+        try {
+            rep = scan2.nextInt();
+            if (!verif(rep, listCategories.size()+1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0){
+            categorieChoisie = listCategories.get(rep-1);
+            rep = -1;
+            listePlats = recupPlats(categorieChoisie.getIdcategorie());
+            System.out.println("Nos plats");
+            for (Plat plat : listePlats){
+                System.out.println("\u001B[97m" + "[" + plat.getNomplat() + " à " + plat.getPrixplat() + "]" + "\u001B[0m");
+            }
+            System.out.println("--------------------------------------" + n + "Voici les différentes plats du restaurant" + n
+                    + "--------------------------------------" + n + "1-" + listePlats.size() + ". Selectionner un plat"
+                    + n + "0. Annuler");
+            try {
+                rep = scan2.nextInt();
+                if (!verif(rep, listePlats.size()+1)) {
+                    System.out.println("Entrée non valide");
+                    rep = -1;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+            if (rep > 0){
+                platChoisi = listePlats.get(rep-1);
+                InsererPlat(connect(), numTable, platChoisi.getIdplat());
+            }
+            System.out.println("Opération annulée");
+        }
+        System.out.println("Opération annulée");
+    }
+
+    /**
+     * Méthode pour se connecter à la base de donnée
+     *
+     * @return la connection à la base
+     */
+    public Connection connect() {
+        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+        String user = "m1user1_03";
+        String password = "m1user1_03";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return conn;
+    }
+
 }
