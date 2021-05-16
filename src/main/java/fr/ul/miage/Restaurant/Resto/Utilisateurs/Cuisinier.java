@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
 import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class Cuisinier extends Utilisateur {
@@ -62,9 +63,11 @@ public class Cuisinier extends Utilisateur {
         int idCommande;
         do {
             idCommande = afficherListesAttentes(conn);
-        }while (idCommande == -1);
-        String query ="UPDATE souscommande SET etatsouscommande = 'prepare' WHERE idsouscommande = '"+idCommande+"'";
-        GestionBDD.executeUpdate(conn,query);
+        } while (idCommande == -1);
+        if (idCommande != 0) {
+            String query = "UPDATE souscommande SET etatsouscommande = 'prepare' WHERE idsouscommande = '" + idCommande + "'";
+            GestionBDD.executeUpdate(conn, query);
+        }
 
     }
 
@@ -203,7 +206,7 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour inserer le lien entre mp et plat
-     * 
+     *
      * @param conn
      * @param idPlat
      * @param idMp
@@ -212,12 +215,12 @@ public class Cuisinier extends Utilisateur {
     public void insererPlat_mp(Connection conn, Integer idPlat, Integer idMp, Integer quantite) {
         String sql = "INSERT INTO plat_mp(plat, mp, quantite)VALUES ('" + idPlat + "',' " + idMp + "',' " + quantite
                 + "')";
-        GestionBDD.executeUpdate(conn,sql);
+        GestionBDD.executeUpdate(conn, sql);
     }
 
     /**
      * Méthode pour vérifier que le nom du plat n'est pas déja pris
-     * 
+     *
      * @param nomPlat
      * @param plats
      * @return
@@ -233,7 +236,7 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour insérer un plat dans la base
-     * 
+     *
      * @param conn
      * @param nom
      * @param prix
@@ -244,12 +247,12 @@ public class Cuisinier extends Utilisateur {
 
         String sql = "INSERT INTO plat(nomplat, prixplat, cat)VALUES ('" + nom + "',' " + prix + "',' " + idCat
                 + "')";
-        GestionBDD.executeUpdate(conn,sql);
+        GestionBDD.executeUpdate(conn, sql);
     }
 
     /**
      * Méthode pour obtenir l'id d'un plat
-     * 
+     *
      * @param conn
      * @param nom
      * @return
@@ -258,7 +261,7 @@ public class Cuisinier extends Utilisateur {
         try {
 
             String sql = "SELECT idplat FROM plat WHERE nomplat = '" + nom + "'";
-            ResultSet rs = GestionBDD.executeSelect(conn,sql);
+            ResultSet rs = GestionBDD.executeSelect(conn, sql);
             rs.next();
             return rs.getInt(1);
         } catch (SQLException e) {
@@ -269,7 +272,7 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour récupérer les différentes catégories présentes dans la base
-     * 
+     *
      * @param conn le connection à la base
      * @return une liste de catégorie
      */
@@ -277,7 +280,7 @@ public class Cuisinier extends Utilisateur {
         ArrayList<Categorie> cats = new ArrayList<Categorie>();
         try {
 
-            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM categorie");
+            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT * FROM categorie");
             while (rs.next()) {
                 cats.add(new Categorie(rs.getInt(1), rs.getString(2)));
             }
@@ -289,7 +292,7 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour récupérer les différents plats déjà présents dans la base
-     * 
+     *
      * @param conn la connection à la base
      * @return une liste de plat
      */
@@ -311,7 +314,7 @@ public class Cuisinier extends Utilisateur {
     /**
      * Méthode pour récupérer les différentes matières premières dans la base de
      * données
-     * 
+     *
      * @param conn la connection à la base
      * @return une liste de mp
      */
@@ -319,7 +322,7 @@ public class Cuisinier extends Utilisateur {
         ArrayList<Mp> mps = new ArrayList<Mp>();
         try {
 
-            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM mp");
+            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT * FROM mp");
             while (rs.next()) {
                 mps.add(new Mp(rs.getInt(1), rs.getString(2), rs.getInt(3)));
             }
@@ -330,26 +333,26 @@ public class Cuisinier extends Utilisateur {
     }
 
 
-
     /**
      * Méthode pour afficher les deux listes d'attentes en cuisine
+     *
      * @param conn connection à la base
      * @return le numero de la sous commandde qui a été préparer ou -1 si la saisie est incorrecte
      */
-    public Integer afficherListesAttentes(Connection conn){
+    public Integer afficherListesAttentes(Connection conn) {
         Integer rep;
         ArrayList<SousCommande> enfants = getListeAttenteEnfant(conn);
         ArrayList<SousCommande> normaux = getListeAttente(conn);
         System.out.println("Voici la liste d'attente des menus enfants (prioritaire)");
-        for(SousCommande sscom : enfants){
+        for (SousCommande sscom : enfants) {
             System.out.println(sscom);
         }
         System.out.println("Voici la liste d'attente des plats (non prioritaire)");
-        for(SousCommande sscom : normaux){
+        for (SousCommande sscom : normaux) {
             System.out.println(sscom);
         }
         System.out.println("Quelle commande avez vous préparez ? (Entrez son numéro)");
-        try{
+        try {
             Scanner s = new Scanner(System.in);
             rep = s.nextInt();
             Boolean bonneRep = false;
@@ -357,15 +360,13 @@ public class Cuisinier extends Utilisateur {
             Integer i = 0;
             ArrayList<SousCommande> fusion = enfants;
             fusion.addAll(normaux);
-            if (verifNum(rep, fusion)){
+            if (verifNum(rep, fusion)) {
                 return rep;
-            }
-            else{
+            } else {
                 System.out.println("Numéro non valide");
                 return -1;
             }
-        }
-        catch (InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("Numéro non valide");
             return -1;
         }
@@ -373,7 +374,8 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour vérifier le numéro d'une sous-commande
-     * @param num numéro rentré par le cuisinier
+     *
+     * @param num    numéro rentré par le cuisinier
      * @param sscoms liste de toute les commandes possibles
      * @return true si le numéro existe dans la liste, false sinon
      */
@@ -388,13 +390,14 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour obtenir la liste d'attente des plats normaux
+     *
      * @param conn connection à la base
      */
-    public ArrayList<SousCommande> getListeAttente(Connection conn){
+    public ArrayList<SousCommande> getListeAttente(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 
-            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
+            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
             while (rs.next()) {
                 sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
             }
@@ -406,13 +409,14 @@ public class Cuisinier extends Utilisateur {
 
     /**
      * Méthode pour obtenir la liste d'attente des plats pour enfants
+     *
      * @param conn connection à la base
      */
-    public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn){
+    public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 
-            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat = 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
+            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat = 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
             while (rs.next()) {
                 sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
             }
