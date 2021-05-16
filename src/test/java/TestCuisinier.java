@@ -1,6 +1,7 @@
 import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.SousCommande;
 import fr.ul.miage.Restaurant.Resto.Utilisateurs.Cuisinier;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -31,7 +32,7 @@ public class TestCuisinier {
     @Test
     void testConnect(){
         Cuisinier c = new Cuisinier("PontTi");
-        assertNotNull(c.connect());
+        assertNotNull(GestionBDD.connect());
     }
 
     @Test

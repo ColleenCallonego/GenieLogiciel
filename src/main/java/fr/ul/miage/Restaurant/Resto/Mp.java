@@ -11,7 +11,7 @@ public class Mp {
         this.stockmp = stockmp;
     }
 
-    public Mp(int anInt, int anInt1) {
+    public Mp(int idmp, int stockmp) {
         this.idmp = idmp;
         this.stockmp = stockmp;
     }
