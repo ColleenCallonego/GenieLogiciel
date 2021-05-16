@@ -1,6 +1,7 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
 import fr.ul.miage.Restaurant.Resto.Plat;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -82,11 +83,16 @@ public class Directeur extends Utilisateur {
     private void gestionEmployes() {
         scan.reset();
         System.out.println("Que souhaitez-vous faire ?\n0.retour\n1.ajouter un employer\n2.supprimer un employe");
-        int choice=scan.nextInt();
-        switch (choice){
-            case 0:break;
-            case 1:ajouterEmploye();break;
-            case 2:supprimerEmploye();break;
+        int choice = scan.nextInt();
+        switch (choice) {
+            case 0:
+                break;
+            case 1:
+                ajouterEmploye();
+                break;
+            case 2:
+                supprimerEmploye();
+                break;
 
         }
     }
@@ -97,11 +103,10 @@ public class Directeur extends Utilisateur {
         String name = scan.next();
 
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            String query = "DELETE FROM utilisateur WHERE idutili='"+name+"'";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            st.executeUpdate(query);
+
+            String query = "DELETE FROM utilisateur WHERE idutili='" + name + "'";
+            Connection conn = GestionBDD.connect();
+            GestionBDD.executeUpdate(conn,query);
 
             conn.close();
         } catch (SQLException throwables) {
@@ -120,11 +125,10 @@ public class Directeur extends Utilisateur {
         String type = scan.next();
 
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp+ "','"+type+"')";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            st.executeUpdate(query);
+
+            String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp + "','" + type + "')";
+            Connection conn = GestionBDD.connect();
+            GestionBDD.executeUpdate(conn,query);
 
             conn.close();
         } catch (SQLException throwables) {
@@ -135,11 +139,10 @@ public class Directeur extends Utilisateur {
     private void gestionMatPremieres() {
         System.out.println("Selectionner l'option 'ajout' ou l'aliment à modifier");
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+
             String query = "SELECT * FROM mp";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = (st).executeQuery(query);
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,query);
 
             //affichage des matieres premieres
             int index = 2;
@@ -179,14 +182,13 @@ public class Directeur extends Utilisateur {
         int quantity = scan.nextInt();
 
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+
             String query = "INSERT INTO mp (nommp, stockmp) VALUES ('" + name + "','" + quantity + "')";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            int status = st.executeUpdate(query);
-            if (status == 0) {
-                System.out.println("changement effectue avec succes");
-            }
+            Connection conn = GestionBDD.connect();
+            GestionBDD.executeUpdate(conn, query);
+
+            System.out.println("changement effectue avec succes");
+
             conn.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -202,14 +204,12 @@ public class Directeur extends Utilisateur {
      */
     private void modifQuantite(int id, int quantity) {
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
+            Connection conn = GestionBDD.connect();
             String query = "UPDATE mp SET stockmp = '" + quantity + "' WHERE idmp ='" + id + "'";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            int status = st.executeUpdate(query);
-            if (status == 0) {
-                System.out.println("changement effectue avec succes");
-            }
+            GestionBDD.executeUpdate(conn, query);
+
+            System.out.println("changement effectue avec succes");
+
             conn.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -219,7 +219,7 @@ public class Directeur extends Utilisateur {
 
     public void gestionCarteDuJour() {
         Scanner scan = new Scanner(System.in);
-        Connection conn = connect();
+        Connection conn = GestionBDD.connect();
         SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
         String n = System.getProperty("line.separator");
@@ -279,39 +279,16 @@ public class Directeur extends Utilisateur {
         }
     }
 
-    /**
-     * Méthode pour se connecter à la base de donnée
-     *
-     * @return la connection à la base
-     */
-    public Connection connect() {
-        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-        String user = "m1user1_03";
-        String password = "m1user1_03";
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
-    }
 
     public void creerCarteDuJour(Connection conn, Date d) {
-        try {
-            Statement st = conn.createStatement();
-            String sql = "INSERT INTO cartedujour(datecartejour)VALUES ('" + d + "')";
-            Integer status = st.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String sql = "INSERT INTO cartedujour(datecartejour)VALUES ('" + d + "')";
+        GestionBDD.executeUpdate(conn, sql);
     }
 
     public Integer getIdCarteDuJour(Connection conn, Date d) {
         try {
-            Statement st = conn.createStatement();
             String sql = "SELECT idcartedujour FROM cartedujour WHERE datecartejour = '" + d + "'";
-            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs = GestionBDD.executeSelect(conn, sql);
             if (rs.next()) {
                 return rs.getInt(1);
             } else {
@@ -332,9 +309,8 @@ public class Directeur extends Utilisateur {
     public ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(
-                    "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie");
+            String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie";
+            ResultSet rs = GestionBDD.executeSelect(conn, query);
             while (rs.next()) {
                 plats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getString(4)));
             }
@@ -345,12 +321,7 @@ public class Directeur extends Utilisateur {
     }
 
     public void créerCarteJour_Plat(Connection conn, Integer carte, Integer plat) {
-        try {
-            Statement st = conn.createStatement();
-            String sql = "INSERT INTO cartejour_plat(carte, plat)VALUES ('" + carte + "',' " + plat + "')";
-            Integer status = st.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String sql = "INSERT INTO cartejour_plat(carte, plat)VALUES ('" + carte + "',' " + plat + "')";
+        GestionBDD.executeUpdate(conn, sql);
     }
 }
