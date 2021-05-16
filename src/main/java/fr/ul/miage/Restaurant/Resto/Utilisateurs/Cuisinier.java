@@ -343,14 +343,25 @@ public class Cuisinier extends Utilisateur {
         Integer rep;
         ArrayList<SousCommande> enfants = getListeAttenteEnfant(conn);
         ArrayList<SousCommande> normaux = getListeAttente(conn);
-        System.out.println("Voici la liste d'attente des menus enfants (prioritaire)");
-        for (SousCommande sscom : enfants) {
-            System.out.println(sscom);
+        if (enfants.size() ==0){
+            System.out.println("Il n'y a pas de menu enfant à préparer");
         }
-        System.out.println("Voici la liste d'attente des plats (non prioritaire)");
-        for (SousCommande sscom : normaux) {
-            System.out.println(sscom);
+        else{
+            System.out.println("Voici la liste d'attente des menus enfants (prioritaire)");
+            for (SousCommande sscom : enfants) {
+                System.out.println(sscom);
+            }
         }
+        if (normaux.size() == 0){
+            System.out.println("Il n'y a pas de plat normal à préparer");
+        }
+        else{
+            System.out.println("Voici la liste d'attente des plats (non prioritaire)");
+            for (SousCommande sscom : normaux) {
+                System.out.println(sscom);
+            }
+        }
+        System.out.println("0. Annuler");
         System.out.println("Quelle commande avez vous préparez ? (Entrez son numéro)");
         try {
             Scanner s = new Scanner(System.in);
@@ -360,7 +371,7 @@ public class Cuisinier extends Utilisateur {
             Integer i = 0;
             ArrayList<SousCommande> fusion = enfants;
             fusion.addAll(normaux);
-            if (verifNum(rep, fusion)) {
+            if (verifNum(rep, fusion) || rep == 0) {
                 return rep;
             } else {
                 System.out.println("Numéro non valide");

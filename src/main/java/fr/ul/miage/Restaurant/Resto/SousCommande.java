@@ -19,7 +19,7 @@ public class SousCommande {
 
     @Override
     public String toString() {
-        return "Numéro de la commande" + numeroSousCommande +
+        return "Numéro de la commande : " + numeroSousCommande +
                 " | Plat : " + nomplat;
     }
 

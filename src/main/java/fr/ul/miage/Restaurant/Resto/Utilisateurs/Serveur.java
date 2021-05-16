@@ -255,6 +255,8 @@ public class Serveur extends Utilisateur {
                 for (Mp mpPlat : listMpsPlat) {
                     if (mp.getIdmp() == mpPlat.getIdmp()) {
                         Integer newStock = mp.getStockmp() - mpPlat.getStockmp();
+                        System.out.println(mp.getIdmp());
+                        System.out.println(newStock);
                         Statement st = conn.createStatement();
                         String sql = "UPDATE mp SET stockmp = " + newStock + "WHERE idmp = " + mp.getIdmp();
                         Integer status = st.executeUpdate(sql);
