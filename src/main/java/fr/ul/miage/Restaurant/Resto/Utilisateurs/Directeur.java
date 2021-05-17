@@ -217,7 +217,7 @@ public class Directeur extends Utilisateur {
 
     }
 
-    public void gestionCarteDuJour() {
+    private void gestionCarteDuJour() {
         Scanner scan = new Scanner(System.in);
         Connection conn = GestionBDD.connect();
         SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
@@ -280,12 +280,12 @@ public class Directeur extends Utilisateur {
     }
 
 
-    public void creerCarteDuJour(Connection conn, Date d) {
+    private void creerCarteDuJour(Connection conn, Date d) {
         String sql = "INSERT INTO cartedujour(datecartejour)VALUES ('" + d + "')";
         GestionBDD.executeUpdate(conn, sql);
     }
 
-    public Integer getIdCarteDuJour(Connection conn, Date d) {
+    private Integer getIdCarteDuJour(Connection conn, Date d) {
         try {
             String sql = "SELECT idcartedujour FROM cartedujour WHERE datecartejour = '" + d + "'";
             ResultSet rs = GestionBDD.executeSelect(conn, sql);
@@ -306,7 +306,7 @@ public class Directeur extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de plat
      */
-    public ArrayList<Plat> getPlats(Connection conn) {
+    private ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
             String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie";
@@ -320,7 +320,7 @@ public class Directeur extends Utilisateur {
         return plats;
     }
 
-    public void créerCarteJour_Plat(Connection conn, Integer carte, Integer plat) {
+    private void créerCarteJour_Plat(Connection conn, Integer carte, Integer plat) {
         String sql = "INSERT INTO cartejour_plat(carte, plat)VALUES ('" + carte + "',' " + plat + "')";
         GestionBDD.executeUpdate(conn, sql);
     }

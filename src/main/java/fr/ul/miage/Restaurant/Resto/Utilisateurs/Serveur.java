@@ -21,7 +21,7 @@ public class Serveur extends Utilisateur {
         listTables = new ArrayList<>();
     }
 
-    public void recupTables() {
+    private void recupTables() {
         listTables = new ArrayList<>();
         try {
             Connection conn = GestionBDD.connect();
@@ -36,7 +36,7 @@ public class Serveur extends Utilisateur {
         }
     }
 
-    public ArrayList<Categorie> recupCategories() {
+    private ArrayList<Categorie> recupCategories() {
         ArrayList<Categorie> listCategories = new ArrayList<>();
         try {
 
@@ -52,7 +52,7 @@ public class Serveur extends Utilisateur {
         return listCategories;
     }
 
-    public ArrayList<Plat> recupPlats(int idCategorie) {
+    private ArrayList<Plat> recupPlats(int idCategorie) {
         ArrayList<Plat> listPlats = new ArrayList<>();
         Date dateJour = new Date();
         try {
@@ -210,7 +210,7 @@ public class Serveur extends Utilisateur {
      * @param table table sélectionnée
      * @return le choix du serveur
      */
-    public Integer EcranTableServeur(Table table) {
+    private Integer EcranTableServeur(Table table) {
         int rep = -1;
         Scanner scan2 = new Scanner(System.in);
         String n = System.getProperty("line.separator");
@@ -231,7 +231,7 @@ public class Serveur extends Utilisateur {
         return rep;
     }
 
-    public void InsererPlat(Connection conn, Integer numeroTable, Integer plat) {
+    private void InsererPlat(Connection conn, Integer numeroTable, Integer plat) {
         Integer idCommande = getIdCommande(conn, numeroTable);
         if (idCommande == -1) {
             creerCommande(conn, numeroTable);
@@ -247,7 +247,7 @@ public class Serveur extends Utilisateur {
      * @param conn connection à la base
      * @param plat plat concerné
      */
-    public void modifierStockMP(Connection conn, Integer plat) {
+    private void modifierStockMP(Connection conn, Integer plat) {
         ArrayList<Mp> listMpsPlat = getInfoMpPlat(conn, plat);
         ArrayList<Mp> listInfoMps = getInfoMp(conn, listMpsPlat);
         for (Mp mp : listInfoMps) {
@@ -268,7 +268,7 @@ public class Serveur extends Utilisateur {
      * @param plat plat concerné
      * @return une liste de matière première présente dans le plat
      */
-    public ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat) {
+    private ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat) {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
             String sql = "SELECT mp, quantite FROM plat_mp WHERE plat = '" + plat + "'";
@@ -290,7 +290,7 @@ public class Serveur extends Utilisateur {
      * @param mps  liste de matière première
      * @return une liste avec les infos des matières premières
      */
-    public ArrayList<Mp> getInfoMp(Connection conn, ArrayList<Mp> mps) {
+    private ArrayList<Mp> getInfoMp(Connection conn, ArrayList<Mp> mps) {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
             for (Mp mp : mps) {
@@ -314,7 +314,7 @@ public class Serveur extends Utilisateur {
      * @param plat     plat à ajouter
      * @param commande commande concernée
      */
-    public void insererSousCommande(Connection conn, Integer plat, Integer commande) {
+    private void insererSousCommande(Connection conn, Integer plat, Integer commande) {
         Date d = new Date();
         String sql = "INSERT INTO souscommande(heurecommande, etatsouscommande, plat, commande)VALUES ('" + d + "', 'commande', '" + plat + "', '" + commande + "')";
         GestionBDD.executeUpdate(conn,sql);
@@ -326,7 +326,7 @@ public class Serveur extends Utilisateur {
      * @param conn connection à la base
      * @param num  numéro de la table liée à la commande
      */
-    public void creerCommande(Connection conn, Integer num) {
+    private void creerCommande(Connection conn, Integer num) {
         try {
             java.util.Date d = new Date();
             String service;
@@ -350,7 +350,7 @@ public class Serveur extends Utilisateur {
      * @param table numéro de la table concerné
      * @return le numéro de la table si une commande en cours pour cette table existe, -1 sinon
      */
-    public Integer getIdCommande(Connection conn, Integer table) {
+    private Integer getIdCommande(Connection conn, Integer table) {
         try {
 
             String sql = "SELECT numerocommande FROM commande WHERE tableresto = '" + table + "' AND statuscommande = 'En cours'";
