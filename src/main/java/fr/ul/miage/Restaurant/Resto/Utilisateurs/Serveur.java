@@ -5,6 +5,7 @@ import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Mp;
 import fr.ul.miage.Restaurant.Resto.Plat;
 import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,10 +24,8 @@ public class Serveur extends Utilisateur {
     public void recupTables() {
         listTables = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while (rs.next()) {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3),
                         rs.getString(4), rs.getString(5)));
@@ -40,10 +39,9 @@ public class Serveur extends Utilisateur {
     public ArrayList<Categorie> recupCategories() {
         ArrayList<Categorie> listCategories = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM categorie");
+
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM categorie");
             while (rs.next()) {
                 listCategories.add(new Categorie(rs.getInt(1), rs.getString(2)));
             }
@@ -58,16 +56,16 @@ public class Serveur extends Utilisateur {
         ArrayList<Plat> listPlats = new ArrayList<>();
         Date dateJour = new Date();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+
+            Connection conn = GestionBDD.connect();
             String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat FROM plat JOIN cartejour_plat " +
                     "ON cartejour_plat.plat = plat.idplat JOIN cartedujour ON cartedujour.idcartedujour = cartejour_plat.carte" +
                     " AND cartedujour.datecartejour = '" + dateJour + "' AND plat.cat =" + idCategorie +
                     "JOIN plat_mp ON plat_mp.plat = plat.idplat JOIN mp ON plat_mp.mp = mp.idmp " +
                     "WHERE plat_mp.quantite <= mp.stockmp" +
                     "GROUP BY plat.nomplat, plat.idplat HAVING COUNT(*) = plat.nbmp";
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
+
+            ResultSet rs = GestionBDD.executeSelect(conn,query);
             while (rs.next()) {
                 listPlats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3)));
             }
@@ -169,10 +167,9 @@ public class Serveur extends Utilisateur {
             //changer l'état dans la base
             String nouvelEtat = listeEtat.get(rep - 1);
             try {
-                String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-                Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-                Statement st = conn.createStatement();
-                st.executeUpdate("UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+
+                Connection conn = GestionBDD.connect();
+                GestionBDD.executeUpdate(conn,"UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
                 System.out.println("La modification a fonctionnée");
                 conn.close();
             } catch (SQLException e) {
@@ -251,21 +248,16 @@ public class Serveur extends Utilisateur {
      * @param plat plat concerné
      */
     public void modifierStockMP(Connection conn, Integer plat) {
-        try {
-            ArrayList<Mp> listMpsPlat = getInfoMpPlat(conn, plat);
-            ArrayList<Mp> listInfoMps = getInfoMp(conn, listMpsPlat);
-            for (Mp mp : listInfoMps) {
-                for (Mp mpPlat : listMpsPlat) {
-                    if (mp.getIdmp() == mpPlat.getIdmp()) {
-                        Integer newStock = mp.getStockmp() - mpPlat.getStockmp();
-                        Statement st = conn.createStatement();
-                        String sql = "UPDATE mp SET stockmp = " + newStock + "WHERE idmp = " + mp.getIdmp();
-                        Integer status = st.executeUpdate(sql);
-                    }
+        ArrayList<Mp> listMpsPlat = getInfoMpPlat(conn, plat);
+        ArrayList<Mp> listInfoMps = getInfoMp(conn, listMpsPlat);
+        for (Mp mp : listInfoMps) {
+            for (Mp mpPlat : listMpsPlat) {
+                if (mp.getIdmp() == mpPlat.getIdmp()) {
+                    Integer newStock = mp.getStockmp() - mpPlat.getStockmp();
+                    String sql = "UPDATE mp SET stockmp = " + newStock + "WHERE idmp = " + mp.getIdmp();
+                    GestionBDD.executeUpdate(conn,sql);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -279,9 +271,8 @@ public class Serveur extends Utilisateur {
     public ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat) {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
-            Statement st = conn.createStatement();
             String sql = "SELECT mp, quantite FROM plat_mp WHERE plat = '" + plat + "'";
-            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs = GestionBDD.executeSelect(conn,sql);
             while (rs.next()) {
                 list.add(new Mp(rs.getInt(1), rs.getInt(2)));
             }
@@ -303,9 +294,8 @@ public class Serveur extends Utilisateur {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
             for (Mp mp : mps) {
-                Statement st = conn.createStatement();
                 String sql = "SELECT idmp, stockmp FROM mp WHERE idmp = '" + mp.getIdmp() + "'";
-                ResultSet rs = st.executeQuery(sql);
+                ResultSet rs = GestionBDD.executeSelect(conn,sql);
                 while (rs.next()) {
                     list.add(new Mp(rs.getInt(1), rs.getInt(2)));
                 }
@@ -325,14 +315,9 @@ public class Serveur extends Utilisateur {
      * @param commande commande concernée
      */
     public void insererSousCommande(Connection conn, Integer plat, Integer commande) {
-        try {
-            java.util.Date d = new Date();
-            Statement st = conn.createStatement();
-            String sql = "INSERT INTO souscommande(heurecommande, etatsouscommande, plat, commande)VALUES ('" + d + "', 'commande', '" + plat + "', '" + commande + "')";
-            Integer status = st.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Date d = new Date();
+        String sql = "INSERT INTO souscommande(heurecommande, etatsouscommande, plat, commande)VALUES ('" + d + "', 'commande', '" + plat + "', '" + commande + "')";
+        GestionBDD.executeUpdate(conn,sql);
     }
 
     /**
@@ -367,9 +352,9 @@ public class Serveur extends Utilisateur {
      */
     public Integer getIdCommande(Connection conn, Integer table) {
         try {
-            Statement st = conn.createStatement();
+
             String sql = "SELECT numerocommande FROM commande WHERE tableresto = '" + table + "' AND statuscommande = 'En cours'";
-            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs = GestionBDD.executeSelect(conn,sql);
             if (rs.next()) {
                 return rs.getInt(1);
             } else {
@@ -431,29 +416,14 @@ public class Serveur extends Utilisateur {
             }
             if (rep > 0) {
                 platChoisi = listePlats.get(rep - 1);
-                InsererPlat(connect(), numTable, platChoisi.getIdplat());
+                InsererPlat(GestionBDD.connect(), numTable, platChoisi.getIdplat());
             }
             System.out.println("Opération annulée");
         }
         System.out.println("Opération annulée");
     }
 
-    /**
-     * Méthode pour se connecter à la base de donnée
-     *
-     * @return la connection à la base
-     */
-    public Connection connect() {
-        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-        String user = "m1user1_03";
-        String password = "m1user1_03";
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
-    }
+
+
 
 }
