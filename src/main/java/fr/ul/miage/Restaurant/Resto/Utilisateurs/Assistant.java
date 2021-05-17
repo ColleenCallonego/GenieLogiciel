@@ -56,7 +56,7 @@ public class Assistant extends Utilisateur {
         EcranTableAssitant(num - 1);
     }
 
-    public void recupTables() {
+    private void recupTables() {
         listTables = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
@@ -79,7 +79,7 @@ public class Assistant extends Utilisateur {
      * @param numero numéro de la table concernée
      * @return choix de l'assistant
      */
-    public Integer EcranTableAssitant(Integer numero) {
+    private Integer EcranTableAssitant(Integer numero) {
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
