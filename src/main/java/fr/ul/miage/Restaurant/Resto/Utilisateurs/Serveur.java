@@ -117,9 +117,12 @@ public class Serveur extends Utilisateur {
                 changerEtatTable(num);
                 break;
             case 2:
-                ajouterPlat(num);
+                changerEtatRepas(num);
                 break;
             case 3:
+                ajouterPlat(num);
+                break;
+            case 4:
                 imprimerFacture();
                 break;
         }
@@ -181,6 +184,58 @@ public class Serveur extends Utilisateur {
 
     }
 
+    private void changerEtatRepas(int numTable) {
+        ArrayList<String> listeEtat = new ArrayList<>();
+        //recuperer l'etat
+        String etatActuel = listTables.get(numTable - 1).getEtatrepas();
+        if (etatActuel.equals("Entrée")) {
+            listeEtat.add("Plat");
+            listeEtat.add("Dessert");
+        }
+        if (etatActuel.equals("Plat")) {
+            listeEtat.add("Dessert");
+        }
+        //faire le choix du nouvel etat
+        int rep = -1;
+        Scanner scan = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+        for (String etat : listeEtat) {
+            System.out.println("\u001B[97m" + "[" + etat + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Changer l'état du repas" + n
+                + "--------------------------------------");
+        if (listeEtat.size() != 0) {
+            System.out.println("1-" + listeEtat.size() + ". Selectionner un état");
+        }
+        System.out.println("0. Annuler" + n + n + n + "Que voulez vous faire?");
+        try {
+            rep = scan.nextInt();
+            if (!verif(rep, listeEtat.size() + 1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0) {
+            //changer l'état dans la base
+            String nouvelEtat = listeEtat.get(rep - 1);
+            try {
+
+                Connection conn = GestionBDD.connect();
+                GestionBDD.executeUpdate(conn,"UPDATE tableresto SET etatrepas = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+                System.out.println("La modification a fonctionnée");
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Modification annulée");
+        }
+
+    }
+
     private void imprimerFacture() {
     }
 
@@ -217,11 +272,11 @@ public class Serveur extends Utilisateur {
         System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
                 + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
                 + "Etat du repas : " + table.getEtatrepas() + n + n + "--------------------------------------" + n
-                + "1. Changer le status de la table" + n + "2. Ajouter un plat" + n + "3. Obtenir la facture" + n
+                + "1. Changer le status de la table" + n + "2. Changer l'état du repas'" + n + "3. Ajouter un plat" + n + "4. Obtenir la facture" + n
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan2.nextInt();
-            if (!verif(rep, 4)) {
+            if (!verif(rep, 5)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
