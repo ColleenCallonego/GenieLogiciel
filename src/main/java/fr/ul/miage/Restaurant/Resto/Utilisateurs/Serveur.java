@@ -188,12 +188,14 @@ public class Serveur extends Utilisateur {
         ArrayList<String> listeEtat = new ArrayList<>();
         //recuperer l'etat
         String etatActuel = listTables.get(numTable - 1).getEtatrepas();
-        if (etatActuel.equals("Entrée")) {
-            listeEtat.add("Plat");
-            listeEtat.add("Dessert");
-        }
-        if (etatActuel.equals("Plat")) {
-            listeEtat.add("Dessert");
+        if (etatActuel != null) {
+            if (etatActuel.equals("Entrée")) {
+                listeEtat.add("Plat");
+                listeEtat.add("Dessert");
+            }
+            if (etatActuel.equals("Plat")) {
+                listeEtat.add("Dessert");
+            }
         }
         //faire le choix du nouvel etat
         int rep = -1;
@@ -272,7 +274,7 @@ public class Serveur extends Utilisateur {
         System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
                 + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
                 + "Etat du repas : " + table.getEtatrepas() + n + n + "--------------------------------------" + n
-                + "1. Changer le status de la table" + n + "2. Changer l'état du repas'" + n + "3. Ajouter un plat" + n + "4. Obtenir la facture" + n
+                + "1. Changer le status de la table" + n + "2. Changer l'état du repas" + n + "3. Ajouter un plat" + n + "4. Obtenir la facture" + n
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan2.nextInt();
