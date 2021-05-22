@@ -225,7 +225,7 @@ public class Cuisinier extends Utilisateur {
      * @param plats
      * @return
      */
-    private boolean verifNomPlat(String nomPlat, ArrayList<Plat> plats) {
+    public boolean verifNomPlat(String nomPlat, ArrayList<Plat> plats) {
         for (Plat plat : plats) {
             if (plat.compareNom(nomPlat)) {
                 return false;
@@ -379,7 +379,7 @@ public class Cuisinier extends Utilisateur {
      * @param sscoms liste de toute les commandes possibles
      * @return true si le numéro existe dans la liste, false sinon
      */
-    private boolean verifNum(Integer num, ArrayList<SousCommande> sscoms) {
+    public boolean verifNum(Integer num, ArrayList<SousCommande> sscoms) {
         for (SousCommande com : sscoms) {
             if (com.sameNum(num)) {
                 return true;
