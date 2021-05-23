@@ -80,8 +80,19 @@ public class Directeur extends Utilisateur {
     }
 
     private void menuVentes() {
-        //TODO ajouter un switch avec scanner quand on aura besoin d'une autre fonction
-        consulterRecettes();
+        scan.reset();
+        System.out.println("Que souhaitez vous faire ?");
+        System.out.println("0.Consulter le profit du dejeuner" +
+                "\n1.Consulter le profit du diner" +
+                "\n2.Consulter l'ensemble des recettes" +
+                "\n3.Retourner au menu principal");
+        int num = scan.nextInt();
+        Connection conn=GestionBDD.connect();
+        switch (num){
+            case 0: getProfitDejeuner(conn);break;
+            case 1: getProfitDiner(conn);break;
+            case 2: consulterRecettes();break;
+        }
     }
 
     private void consulterRecettes() {
