@@ -25,7 +25,7 @@ public class Assistant extends Utilisateur {
 
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
-            if (table.getEtattable().equals("Débarrasée")){
+            if (table.getEtattable().equals("Débarrassée")){
                 System.out.println("\u001B[31m" + "[Table " + table.getNumero() + " ]" + "\u001B[0m");
             }
             else if (table.getEtattable().equals("Dressée")){

@@ -1,10 +1,6 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import fr.ul.miage.Restaurant.Resto.Categorie;
-import fr.ul.miage.Restaurant.Resto.ColorText;
-import fr.ul.miage.Restaurant.Resto.Mp;
-import fr.ul.miage.Restaurant.Resto.Plat;
-import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.*;
 import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
@@ -76,6 +72,27 @@ public class Serveur extends Utilisateur {
         return listPlats;
     }
 
+    private ArrayList<CommandeFacture> recupCommande(int numTable) {
+        ArrayList<CommandeFacture> listCommande = new ArrayList<>();
+        try {
+            Connection conn = GestionBDD.connect();
+            String query = "SELECT commande.numerocommande, commande.datecommande, plat.nomplat, plat.prixplat FROM commande " +
+                    "JOIN souscommande ON commande.numerocommande = souscommande.commande " +
+                    "JOIN plat ON souscommande.plat = plat.idplat " +
+                    "AND commande.tableresto = " + numTable + " " +
+                    "AND commande.statuscommande = 'En cours' " +
+                    "ORDER by plat.prixplat";
+            ResultSet rs = GestionBDD.executeSelect(conn,query);
+            while (rs.next()) {
+                listCommande.add(new CommandeFacture(rs.getInt(1), rs.getDate(2), rs.getString(3), rs.getInt(4)));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listCommande;
+    }
+
     @Override
     public Integer afficherPrincipal() {
         recupTables();
@@ -123,7 +140,7 @@ public class Serveur extends Utilisateur {
                 ajouterPlat(num);
                 break;
             case 4:
-                imprimerFacture();
+                imprimerFacture(num);
                 break;
         }
     }
@@ -141,7 +158,7 @@ public class Serveur extends Utilisateur {
             listeEtat.add("Libre");
         }
         if (etatActuel.equals("Occupée")) {
-            listeEtat.add("Débarrasée");
+            listeEtat.add("Débarrassée");
         }
         //faire le choix du nouvel etat
         int rep = -1;
@@ -238,7 +255,28 @@ public class Serveur extends Utilisateur {
 
     }
 
-    private void imprimerFacture() {
+    private void imprimerFacture(int numTab) {
+        ArrayList<CommandeFacture> listeCommandFacture = recupCommande(numTab);
+        //affichage/impression de la facture
+        int total = 0;
+        System.out.println("FACTURE     table " + numTab);
+        System.out.println("--------------------------------------");
+        for (CommandeFacture commandeFacture : listeCommandFacture) {
+            System.out.println(commandeFacture.getNomPlatCommande() + " => " + commandeFacture.getPrixPlatCommande() + " €");
+            total += commandeFacture.getPrixPlatCommande();
+        }
+        System.out.println("--------------------------------------");
+        System.out.println("TOTAL   ===>   " + total + " €");
+        //création de la facture et modification etat de la commande sur la BDD
+        try {
+            Connection conn = GestionBDD.connect();
+            String query = "INSERT INTO facture(datefacture, montantfacture, commande) VALUES ('" + listeCommandFacture.get(0).getDateCommande() + "', " + total + ", " + listeCommandFacture.get(0).getIdCommande() + ")";
+            GestionBDD.executeUpdate(conn, query);
+            System.out.println("La facture a bien été enregistrée");
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void colorerTable(Table table) {
@@ -249,7 +287,7 @@ public class Serveur extends Utilisateur {
             case "Occupée":
                 System.out.println("\u001B[33m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
-            case "Débarrasée":
+            case "Débarrassée":
                 System.out.println("\u001B[31m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Réservée":
