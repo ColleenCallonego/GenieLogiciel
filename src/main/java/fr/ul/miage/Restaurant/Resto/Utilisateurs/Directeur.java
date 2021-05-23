@@ -406,4 +406,44 @@ public class Directeur extends Utilisateur {
         String sql = "INSERT INTO cartejour_plat(carte, plat)VALUES ('" + carte + "',' " + plat + "')";
         GestionBDD.executeUpdate(conn, sql);
     }
+
+    /**
+     * Méthode pour obtenir le profit du déjeuner du jour courant
+     * @param conn la connection à la base
+     */
+    public void getProfitDejeuner (Connection conn){
+        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        String sql = "SELECT sum(plat.prixplat) FROM commande JOIN souscommande ON souscommande.commande = commande.numerocommande JOIN plat ON plat.idplat = souscommande.plat WHERE commande.service = 'Déjeuner' AND commande.datecommande = '" + date + "' AND commande.statuscommande = 'Payée' GROUP BY commande.numerocommande";
+        ResultSet rs = GestionBDD.executeSelect(conn, sql);
+        try {
+            Long somme = Long.valueOf(0);
+            while (rs.next()){
+                somme += rs.getLong(1);
+            }
+            System.out.println("Le profit du déjeuner est de : " + somme + " €");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    /**
+     * Méthode pour obtenir le profit du diner du jour courant
+     * @param conn la connection à la base
+     */
+    public void getProfitDiner(Connection conn){
+        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        String sql = "SELECT sum(plat.prixplat) FROM commande JOIN souscommande ON souscommande.commande = commande.numerocommande JOIN plat ON plat.idplat = souscommande.plat WHERE commande.service = 'Diner' AND commande.datecommande = '" + date + "' AND commande.statuscommande = 'Payée' GROUP BY commande.numerocommande";
+        ResultSet rs = GestionBDD.executeSelect(conn, sql);
+        try {
+            Long somme = Long.valueOf(0);
+            while (rs.next()){
+                somme += rs.getLong(1);
+            }
+            System.out.println("Le profit du diner est de : " + somme + " €");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }
