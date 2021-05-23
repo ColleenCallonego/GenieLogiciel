@@ -106,7 +106,7 @@ public class Directeur extends Utilisateur {
         query = "SELECT "+subQuery+" as date,SUM(total) as recette \n" +
                 "FROM (SELECT heurecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
                 "GROUP BY prixplat,heurecommande \n" +
-                "ORDER BY heurecommande ) as r GROUP BY heurecommande ORDER BY date DESC";
+                "ORDER BY heurecommande ) as r GROUP BY date ORDER BY date DESC";
 
         Connection conn = GestionBDD.connect();
         ResultSet rs = GestionBDD.executeSelect(conn,query);
