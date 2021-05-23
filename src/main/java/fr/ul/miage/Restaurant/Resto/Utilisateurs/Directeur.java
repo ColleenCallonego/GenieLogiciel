@@ -66,6 +66,7 @@ public class Directeur extends Utilisateur {
 
                 break;
             case 5:
+                popularitePLats();
 
                 break;
             case 6:
@@ -75,6 +76,40 @@ public class Directeur extends Utilisateur {
 
                 break;
         }
+    }
+
+    private void popularitePLats() {
+        int nbTotalCommandes = 1;
+        try {
+
+            String query = "SELECT COUNT(*) FROM souscommande";
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,query);
+            if (rs.next()){
+               nbTotalCommandes = rs.getInt(1);
+            }
+            query = "SELECT nomplat,COUNT(*) from souscommande join plat ON souscommande.plat = plat.idplat " +
+                    "GROUP BY nomplat ORDER BY count DESC";
+            rs = GestionBDD.executeSelect(conn,query);
+
+            System.out.println("Voici les différents plats avec leur popularité:");
+
+
+            while (rs.next()) {
+                System.out.println("- "+rs.getArray("nomplat") + "  " + String.format("%.2f", 100*(rs.getFloat("count"))/nbTotalCommandes) +" %");
+            }
+
+            System.out.println("\nAppuyer sur une touche puis sur entree pour revenir au menu principal");
+            scan.reset();
+            scan.next();
+
+
+
+            conn.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     /**
