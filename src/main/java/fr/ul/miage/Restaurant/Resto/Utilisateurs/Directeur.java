@@ -63,6 +63,7 @@ public class Directeur extends Utilisateur {
 
                 break;
             case 4:
+                menuVentes();
 
                 break;
             case 5:
@@ -76,6 +77,48 @@ public class Directeur extends Utilisateur {
 
                 break;
         }
+    }
+
+    private void menuVentes() {
+        //TODO ajouter un switch avec scanner quand on aura besoin d'une autre fonction
+        consulterRecettes();
+    }
+
+    private void consulterRecettes() {
+        scan.reset();
+        System.out.println("Quelle granularite temporelle souhaitez-vous ?");
+        System.out.println("0.Recette journaliere\n1.Recette hebdomadaire\n2.Recette mensuelle");
+        int num = scan.nextInt();
+        String query,subQuery;
+        switch (num){
+            case 0: subQuery = "heurecommande";
+                System.out.println("  Date             Recette");
+                break;
+            case 1: subQuery = "date_part('week',heurecommande)";
+                System.out.println("  Semaine  Recette");
+                break;
+            case 2: subQuery = "date_part('month',heurecommande)";
+                System.out.println("  Mois    Recette");
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + num);
+        }
+        query = "SELECT "+subQuery+" as date,SUM(total) as recette \n" +
+                "FROM (SELECT heurecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
+                "GROUP BY prixplat,heurecommande \n" +
+                "ORDER BY heurecommande ) as r GROUP BY heurecommande ORDER BY date DESC";
+
+        Connection conn = GestionBDD.connect();
+        ResultSet rs = GestionBDD.executeSelect(conn,query);
+
+        try{
+            while (rs.next()){
+                System.out.println("- "+rs.getArray("date")+"       "+rs.getArray("recette")+" €");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        attendreFinConsultation();
     }
 
     private void popularitePLats() {
@@ -99,9 +142,7 @@ public class Directeur extends Utilisateur {
                 System.out.println("- "+rs.getArray("nomplat") + "  " + String.format("%.2f", 100*(rs.getFloat("count"))/nbTotalCommandes) +" %");
             }
 
-            System.out.println("\nAppuyer sur une touche puis sur entree pour revenir au menu principal");
-            scan.reset();
-            scan.next();
+            attendreFinConsultation();
 
 
 
@@ -110,6 +151,12 @@ public class Directeur extends Utilisateur {
             throwables.printStackTrace();
         }
 
+    }
+
+    private void attendreFinConsultation() {
+        System.out.println("\nAppuyer sur une touche puis sur entree pour revenir au menu principal");
+        scan.reset();
+        scan.next();
     }
 
     /**
