@@ -2,6 +2,7 @@ package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
 import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class Assistant extends Utilisateur {
 
         String n = System.getProperty("line.separator");
         for (Table table : listTables){
-            if (table.getEtattable().equals("Débarrasée")){
+            if (table.getEtattable().equals("Débarrassée")){
                 System.out.println("\u001B[31m" + "[Table " + table.getNumero() + " ]" + "\u001B[0m");
             }
             else if (table.getEtattable().equals("Dressée")){
@@ -53,7 +54,12 @@ public class Assistant extends Utilisateur {
 
     @Override
     public void appelMethode(Integer num) {
-        EcranTableAssitant(num - 1);
+        Connection conn = GestionBDD.connect();
+        Integer rep = EcranTableAssitant(num - 1);
+        switch (rep){
+            case 1:
+                debarraserTable(conn, num);
+        }
     }
 
     public void recupTables() {
@@ -84,7 +90,8 @@ public class Assistant extends Utilisateur {
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
         System.out.println("--------------------------------------" + n + "Bienvenue à la table numéro " + numero + n
-                + "--------------------------------------" + n + "1. Changer le status de la table" + n
+                + "--------------------------------------" + n + "1. Débarraser" + n
+                + "2. Dresser" + n
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
@@ -96,5 +103,20 @@ public class Assistant extends Utilisateur {
             rep = -1;
         }
         return rep;
+    }
+
+    /**
+     * Méthode pour débarraser une table
+     * @param conn la connection à la base
+     * @param numero le numéro de la table
+     */
+    public void debarraserTable(Connection conn, Integer numero){
+        if (listTables.get(numero - 1).getEtattable().equals("Débarrasée")){
+            String sql = "UPDATE tableresto SET etattable = 'Dressée' WHERE numero = " + numero;
+            GestionBDD.executeUpdate(conn, sql);
+        }
+        else{
+            System.out.println("Cette table n'a pas besoin d'être débarrasée.");
+        }
     }
 }
