@@ -58,7 +58,7 @@ public class Cuisinier extends Utilisateur {
         }
     }
 
-    public void finalisationCommande() {
+    private void finalisationCommande() {
         Connection conn = GestionBDD.connect();
         int idCommande;
         do {
@@ -71,7 +71,7 @@ public class Cuisinier extends Utilisateur {
 
     }
 
-    public void definitionPlat() {
+    private void definitionPlat() {
         try {
             String nomPlat = "";
             Connection conn = GestionBDD.connect();
@@ -212,7 +212,7 @@ public class Cuisinier extends Utilisateur {
      * @param idMp
      * @param quantite
      */
-    public void insererPlat_mp(Connection conn, Integer idPlat, Integer idMp, Integer quantite) {
+    private void insererPlat_mp(Connection conn, Integer idPlat, Integer idMp, Integer quantite) {
         String sql = "INSERT INTO plat_mp(plat, mp, quantite)VALUES ('" + idPlat + "',' " + idMp + "',' " + quantite
                 + "')";
         GestionBDD.executeUpdate(conn, sql);
@@ -242,7 +242,7 @@ public class Cuisinier extends Utilisateur {
      * @param prix
      * @param idCat
      */
-    public void insererPlat(Connection conn, String nom, Integer prix, Integer idCat) {
+    private void insererPlat(Connection conn, String nom, Integer prix, Integer idCat) {
         System.out.println(nom + " " + prix + " " + idCat);
 
         String sql = "INSERT INTO plat(nomplat, prixplat, cat)VALUES ('" + nom + "',' " + prix + "',' " + idCat
@@ -257,7 +257,7 @@ public class Cuisinier extends Utilisateur {
      * @param nom
      * @return
      */
-    public Integer getIdPlat(Connection conn, String nom) {
+    private Integer getIdPlat(Connection conn, String nom) {
         try {
 
             String sql = "SELECT idplat FROM plat WHERE nomplat = '" + nom + "'";
@@ -276,7 +276,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn le connection à la base
      * @return une liste de catégorie
      */
-    public ArrayList<Categorie> getCategories(Connection conn) {
+    private ArrayList<Categorie> getCategories(Connection conn) {
         ArrayList<Categorie> cats = new ArrayList<Categorie>();
         try {
 
@@ -296,7 +296,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de plat
      */
-    public ArrayList<Plat> getPlats(Connection conn) {
+    private ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
 
@@ -318,7 +318,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de mp
      */
-    public ArrayList<Mp> getMPs(Connection conn) {
+    private ArrayList<Mp> getMPs(Connection conn) {
         ArrayList<Mp> mps = new ArrayList<Mp>();
         try {
 
@@ -339,7 +339,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn connection à la base
      * @return le numero de la sous commandde qui a été préparer ou -1 si la saisie est incorrecte
      */
-    public Integer afficherListesAttentes(Connection conn) {
+    private Integer afficherListesAttentes(Connection conn) {
         Integer rep;
         ArrayList<SousCommande> enfants = getListeAttenteEnfant(conn);
         ArrayList<SousCommande> normaux = getListeAttente(conn);
@@ -404,7 +404,7 @@ public class Cuisinier extends Utilisateur {
      *
      * @param conn connection à la base
      */
-    public ArrayList<SousCommande> getListeAttente(Connection conn) {
+    private ArrayList<SousCommande> getListeAttente(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 
@@ -423,7 +423,7 @@ public class Cuisinier extends Utilisateur {
      *
      * @param conn connection à la base
      */
-    public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn) {
+    private ArrayList<SousCommande> getListeAttenteEnfant(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 

@@ -55,7 +55,7 @@ public class MaitreH extends Utilisateur {
         }
     }
 
-    public void recupTables() {
+    private void recupTables() {
         listTables = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
@@ -72,7 +72,7 @@ public class MaitreH extends Utilisateur {
         }
     }
 
-    public void recupServeur() {
+    private void recupServeur() {
         listServeur = new ArrayList<>();
         try {
             String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
@@ -90,7 +90,7 @@ public class MaitreH extends Utilisateur {
     }
 
 
-    public void affectationTable(){
+    private void affectationTable(){
         //recuperer les tables
         recupTables();
         int rep = -1;
