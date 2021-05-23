@@ -59,6 +59,9 @@ public class Assistant extends Utilisateur {
         switch (rep){
             case 1:
                 debarraserTable(conn, num);
+                break;
+            case 2 :
+                dresserTable(conn, num);
         }
     }
 
@@ -95,7 +98,7 @@ public class Assistant extends Utilisateur {
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan.nextInt();
-            if (!verif(rep, 2)) {
+            if (!verif(rep, 3)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {
@@ -117,6 +120,21 @@ public class Assistant extends Utilisateur {
         }
         else{
             System.out.println("Cette table n'a pas besoin d'être débarrasée.");
+        }
+    }
+
+    /**
+     * Méthode pour dresser une table
+     * @param conn le connection à la base
+     * @param numero le numéro de la table
+     */
+    public void dresserTable (Connection conn, Integer numero){
+        if (listTables.get(numero - 1).getEtattable().equals("Dressée")){
+            String sql = "UPDATE tableresto SET etattable = 'Libre' WHERE numero = " + numero;
+            GestionBDD.executeUpdate(conn, sql);
+        }
+        else{
+            System.out.println("Cette table n'a pas besoin d'être dresser.");
         }
     }
 }
