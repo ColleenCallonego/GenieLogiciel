@@ -1,10 +1,6 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import fr.ul.miage.Restaurant.Resto.Categorie;
-import fr.ul.miage.Restaurant.Resto.ColorText;
-import fr.ul.miage.Restaurant.Resto.Mp;
-import fr.ul.miage.Restaurant.Resto.Plat;
-import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.*;
 import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
@@ -76,6 +72,27 @@ public class Serveur extends Utilisateur {
         return listPlats;
     }
 
+    private ArrayList<CommandeFacture> recupCommande(int numTable) {
+        ArrayList<CommandeFacture> listCommande = new ArrayList<>();
+        try {
+            Connection conn = GestionBDD.connect();
+            String query = "SELECT commande.numerocommande, commande.datecommande, plat.nomplat, plat.prixplat FROM commande " +
+                    "JOIN souscommande ON commande.numerocommande = souscommande.commande " +
+                    "JOIN plat ON souscommande.plat = plat.idplat " +
+                    "AND commande.tableresto = " + numTable + " " +
+                    "AND commande.statuscommande = 'En cours' " +
+                    "ORDER by plat.prixplat";
+            ResultSet rs = GestionBDD.executeSelect(conn,query);
+            while (rs.next()) {
+                listCommande.add(new CommandeFacture(rs.getInt(1), rs.getDate(2), rs.getString(3), rs.getInt(4)));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listCommande;
+    }
+
     @Override
     public Integer afficherPrincipal() {
         recupTables();
@@ -117,10 +134,13 @@ public class Serveur extends Utilisateur {
                 changerEtatTable(num);
                 break;
             case 2:
-                ajouterPlat(num);
+                changerEtatRepas(num);
                 break;
             case 3:
-                imprimerFacture();
+                ajouterPlat(num);
+                break;
+            case 4:
+                imprimerFacture(num);
                 break;
         }
     }
@@ -138,7 +158,7 @@ public class Serveur extends Utilisateur {
             listeEtat.add("Libre");
         }
         if (etatActuel.equals("Occupée")) {
-            listeEtat.add("Débarrasée");
+            listeEtat.add("Débarrassée");
         }
         //faire le choix du nouvel etat
         int rep = -1;
@@ -181,7 +201,82 @@ public class Serveur extends Utilisateur {
 
     }
 
-    private void imprimerFacture() {
+    private void changerEtatRepas(int numTable) {
+        ArrayList<String> listeEtat = new ArrayList<>();
+        //recuperer l'etat
+        String etatActuel = listTables.get(numTable - 1).getEtatrepas();
+        if (etatActuel != null) {
+            if (etatActuel.equals("Entrée")) {
+                listeEtat.add("Plat");
+                listeEtat.add("Dessert");
+            }
+            if (etatActuel.equals("Plat")) {
+                listeEtat.add("Dessert");
+            }
+        }
+        //faire le choix du nouvel etat
+        int rep = -1;
+        Scanner scan = new Scanner(System.in);
+        String n = System.getProperty("line.separator");
+        for (String etat : listeEtat) {
+            System.out.println("\u001B[97m" + "[" + etat + "]" + "\u001B[0m");
+        }
+        System.out.println("--------------------------------------" + n + "Changer l'état du repas" + n
+                + "--------------------------------------");
+        if (listeEtat.size() != 0) {
+            System.out.println("1-" + listeEtat.size() + ". Selectionner un état");
+        }
+        System.out.println("0. Annuler" + n + n + n + "Que voulez vous faire?");
+        try {
+            rep = scan.nextInt();
+            if (!verif(rep, listeEtat.size() + 1)) {
+                System.out.println("Entrée non valide");
+                rep = -1;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Entrée non valide");
+            rep = -1;
+        }
+        if (rep > 0) {
+            //changer l'état dans la base
+            String nouvelEtat = listeEtat.get(rep - 1);
+            try {
+
+                Connection conn = GestionBDD.connect();
+                GestionBDD.executeUpdate(conn,"UPDATE tableresto SET etatrepas = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+                System.out.println("La modification a fonctionnée");
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Modification annulée");
+        }
+
+    }
+
+    private void imprimerFacture(int numTab) {
+        ArrayList<CommandeFacture> listeCommandFacture = recupCommande(numTab);
+        //affichage/impression de la facture
+        int total = 0;
+        System.out.println("FACTURE     table " + numTab);
+        System.out.println("--------------------------------------");
+        for (CommandeFacture commandeFacture : listeCommandFacture) {
+            System.out.println(commandeFacture.getNomPlatCommande() + " => " + commandeFacture.getPrixPlatCommande() + " €");
+            total += commandeFacture.getPrixPlatCommande();
+        }
+        System.out.println("--------------------------------------");
+        System.out.println("TOTAL   ===>   " + total + " €");
+        //création de la facture et modification etat de la commande sur la BDD
+        try {
+            Connection conn = GestionBDD.connect();
+            String query = "INSERT INTO facture(datefacture, montantfacture, commande) VALUES ('" + listeCommandFacture.get(0).getDateCommande() + "', " + total + ", " + listeCommandFacture.get(0).getIdCommande() + ")";
+            GestionBDD.executeUpdate(conn, query);
+            System.out.println("La facture a bien été enregistrée");
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void colorerTable(Table table) {
@@ -192,7 +287,7 @@ public class Serveur extends Utilisateur {
             case "Occupée":
                 System.out.println("\u001B[33m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
-            case "Débarrasée":
+            case "Débarrassée":
                 System.out.println("\u001B[31m" + "[Table " + table.getNumero() + "]" + "\u001B[0m");
                 break;
             case "Réservée":
@@ -217,11 +312,11 @@ public class Serveur extends Utilisateur {
         System.out.println("--------------------------------------" + n + "Bienvenue à la table " + table.getNumero()
                 + n + "Nombre de couvert : " + table.getNbplace() + n + "Etat de la table : " + table.getEtattable() + n
                 + "Etat du repas : " + table.getEtatrepas() + n + n + "--------------------------------------" + n
-                + "1. Changer le status de la table" + n + "2. Ajouter un plat" + n + "3. Obtenir la facture" + n
+                + "1. Changer le status de la table" + n + "2. Changer l'état du repas" + n + "3. Ajouter un plat" + n + "4. Obtenir la facture" + n
                 + "0. Retourner à l'écran principal" + n + n + n + "Que voulez vous faire?");
         try {
             rep = scan2.nextInt();
-            if (!verif(rep, 4)) {
+            if (!verif(rep, 5)) {
                 System.out.println("Entrée non valide");
             }
         } catch (InputMismatchException e) {

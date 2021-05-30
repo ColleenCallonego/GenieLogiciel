@@ -80,8 +80,38 @@ public class Directeur extends Utilisateur {
     }
 
     private void menuVentes() {
-        //TODO ajouter un switch avec scanner quand on aura besoin d'une autre fonction
-        consulterRecettes();
+        scan.reset();
+        System.out.println("Que souhaitez vous faire ?");
+        System.out.println("0.Consulter le profit du dejeuner" +
+                "\n1.Consulter le profit du diner" +
+                "\n2.Consulter l'ensemble des recettes" +
+                "\n3.Consulter le temps de preparation moyen" +
+                "\n4.Retourner au menu principal");
+        int num = scan.nextInt();
+        Connection conn=GestionBDD.connect();
+        switch (num){
+            case 0: getProfitDejeuner(conn);break;
+            case 1: getProfitDiner(conn);break;
+            case 2: consulterRecettes();break;
+            case 3: consulterTempsPrep();break;
+        }
+    }
+
+    private void consulterTempsPrep() {
+        String query = "select sum( heurepreparation - heurecommande )/count(*) " +
+                "as tempspreparationmoyen from souscommande where heurepreparation notnull";
+
+        Connection conn = GestionBDD.connect();
+        ResultSet rs = GestionBDD.executeSelect(conn,query);
+
+        try{
+            if (rs.next()){
+                System.out.println("temps de preparation moyen:  "+rs.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        attendreFinConsultation();
     }
 
     private void consulterRecettes() {
@@ -91,22 +121,22 @@ public class Directeur extends Utilisateur {
         int num = scan.nextInt();
         String query,subQuery;
         switch (num){
-            case 0: subQuery = "heurecommande";
+            case 0: subQuery = "datecommande";
                 System.out.println("  Date             Recette");
                 break;
-            case 1: subQuery = "date_part('week',heurecommande)";
+            case 1: subQuery = "date_part('week',datecommande)";
                 System.out.println("  Semaine  Recette");
                 break;
-            case 2: subQuery = "date_part('month',heurecommande)";
+            case 2: subQuery = "date_part('month',datecommande)";
                 System.out.println("  Mois    Recette");
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + num);
         }
         query = "SELECT "+subQuery+" as date,SUM(total) as recette \n" +
-                "FROM (SELECT heurecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
-                "GROUP BY prixplat,heurecommande \n" +
-                "ORDER BY heurecommande ) as r GROUP BY date ORDER BY date DESC";
+                "FROM (SELECT datecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
+                "GROUP BY prixplat,datecommande \n" +
+                "ORDER BY datecommande ) as r GROUP BY date ORDER BY date DESC";
 
         Connection conn = GestionBDD.connect();
         ResultSet rs = GestionBDD.executeSelect(conn,query);
