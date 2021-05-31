@@ -74,7 +74,7 @@ public class Directeur extends Utilisateur {
 
                 break;
             case 7:
-
+                consulterTempsPrep();
                 break;
         }
     }
@@ -85,15 +85,13 @@ public class Directeur extends Utilisateur {
         System.out.println("0.Consulter le profit du dejeuner" +
                 "\n1.Consulter le profit du diner" +
                 "\n2.Consulter l'ensemble des recettes" +
-                "\n3.Consulter le temps de preparation moyen" +
-                "\n4.Retourner au menu principal");
+                "\n3.Retourner au menu principal");
         int num = scan.nextInt();
         Connection conn=GestionBDD.connect();
         switch (num){
             case 0: getProfitDejeuner(conn);break;
             case 1: getProfitDiner(conn);break;
             case 2: consulterRecettes();break;
-            case 3: consulterTempsPrep();break;
         }
     }
 
