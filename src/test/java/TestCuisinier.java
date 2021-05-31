@@ -70,31 +70,31 @@ public class TestCuisinier {
     @Test
     void testgetIdPlat(){
         Integer result = c.getIdPlat(conn, "Burger");
-        assertEquals(result, 16);
+        assertEquals(16, result);
     }
 
     @Test
     void testGetCategories(){
-        assertEquals(c.getCategories(conn).size(), 6);
+        assertEquals(6, c.getCategories(conn).size());
     }
 
     @Test
     void testgetPlats(){
-        assertEquals(c.getPlats(conn).size(), 13);
+        assertEquals(13, c.getPlats(conn).size());
     }
 
     @Test
     void testgetMPs(){
-        assertEquals(c.getMPs(conn).size(), 7);
+        assertEquals(7, c.getMPs(conn).size());
     }
 
     @Test
     void testgetListeAttente(){
-        assertEquals(c.getListeAttente(conn).size(), 0);
+        assertEquals(0, c.getListeAttente(conn).size());
     }
 
     @Test
     void testgetListeAttenteEnfant(){
-        assertEquals(c.getListeAttenteEnfant(conn).size(), 0);
+        assertEquals(0, c.getListeAttenteEnfant(conn).size());
     }
 }

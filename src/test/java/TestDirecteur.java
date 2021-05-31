@@ -31,11 +31,11 @@ public class TestDirecteur {
     @Test
     void testgetIdCarteDuJour() throws ParseException {
         Date da = new SimpleDateFormat("yyyy-MM-dd").parse("2021-05-16");
-        assertEquals(d.getIdCarteDuJour(conn, da), 5);
+        assertEquals(5, d.getIdCarteDuJour(conn, da));
     }
 
     @Test
     void testgetPlats(){
-        assertEquals(d.getPlats(conn).size(), 13);
+        assertEquals(13, d.getPlats(conn).size());
     }
 }

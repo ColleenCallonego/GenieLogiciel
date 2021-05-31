@@ -28,7 +28,7 @@ public class TestAssistant {
     @Test
     void recupTableTest(){
         a.recupTables(conn);
-        assertEquals(a.listTables.size(), 8);
+        assertEquals(8, a.listTables.size());
     }
 }
 

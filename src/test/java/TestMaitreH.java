@@ -29,12 +29,12 @@ public class TestMaitreH {
     @Test
     void testrecupTables(){
         m.recupTables(conn);
-        assertEquals(m.listTables.size(), 8);
+        assertEquals(8, m.listTables.size());
     }
 
     @Test
     void testrecupServeur(){
         m.recupServeur(conn);
-        assertEquals(m.listServeur.size(), 4);
+        assertEquals(4, m.listServeur.size());
     }
 }
