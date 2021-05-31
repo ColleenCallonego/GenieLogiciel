@@ -10,8 +10,8 @@ import java.util.Scanner;
 import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class MaitreH extends Utilisateur {
-    private ArrayList<Table> listTables;
-    private ArrayList<String> listServeur;
+    public ArrayList<Table> listTables;
+    public ArrayList<String> listServeur;
 
     public MaitreH(String id) {
         super(id);
@@ -55,10 +55,9 @@ public class MaitreH extends Utilisateur {
         }
     }
 
-    private void recupTables() {
+    public void recupTables(Connection conn) {
         listTables = new ArrayList<>();
         try {
-            Connection conn = GestionBDD.connect();
             ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while(rs.next()) {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
@@ -69,10 +68,9 @@ public class MaitreH extends Utilisateur {
         }
     }
 
-    private void recupServeur() {
+    public void recupServeur(Connection conn) {
         listServeur = new ArrayList<>();
         try {
-            Connection conn = GestionBDD.connect();
             ResultSet rs = GestionBDD.executeSelect(conn,"SELECT idutili FROM utilisateur WHERE typeutili = 'Serveur'");
             while(rs.next()) {
                 listServeur.add(rs.getString(1));
@@ -86,7 +84,7 @@ public class MaitreH extends Utilisateur {
 
     private void affectationTable(){
         //recuperer les tables
-        recupTables();
+        recupTables(GestionBDD.connect());
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
@@ -130,7 +128,7 @@ public class MaitreH extends Utilisateur {
             //si oui
             if (rep == 1){
                 //recuperer les serveurs
-                recupServeur();
+                recupServeur(GestionBDD.connect());
                 //choisir un serveur changer dans la base
                 rep = -1;
                 scan = new Scanner(System.in);
