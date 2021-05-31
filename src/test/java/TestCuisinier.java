@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestCuisinier {
+
     @Test
     void testVerifNomPlatIdentique(){
         Cuisinier c = new Cuisinier("PontTi");

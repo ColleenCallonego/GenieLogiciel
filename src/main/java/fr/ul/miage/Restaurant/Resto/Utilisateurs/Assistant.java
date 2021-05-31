@@ -11,7 +11,7 @@ import java.util.Scanner;
 import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class Assistant extends Utilisateur {
-    private ArrayList<Table> listTables;
+    public ArrayList<Table> listTables;
 
     public Assistant(String id) {
         super(id);
@@ -20,7 +20,7 @@ public class Assistant extends Utilisateur {
 
     @Override
     public Integer afficherPrincipal() {
-        recupTables();
+        recupTables(GestionBDD.connect());
         int rep = -1;
 
         String n = System.getProperty("line.separator");
@@ -64,10 +64,9 @@ public class Assistant extends Utilisateur {
         }
     }
 
-    private void recupTables() {
+    public void recupTables(Connection conn) {
         listTables = new ArrayList<>();
         try {
-            Connection conn = GestionBDD.connect();
             ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while (rs.next()) {
                 listTables
