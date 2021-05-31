@@ -1,6 +1,5 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Table;
 import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
@@ -12,7 +11,7 @@ import java.util.Scanner;
 import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class Assistant extends Utilisateur {
-    private ArrayList<Table> listTables;
+    public ArrayList<Table> listTables;
 
     public Assistant(String id) {
         super(id);
@@ -21,7 +20,7 @@ public class Assistant extends Utilisateur {
 
     @Override
     public Integer afficherPrincipal() {
-        recupTables();
+        recupTables(GestionBDD.connect());
         int rep = -1;
 
         String n = System.getProperty("line.separator");
@@ -65,18 +64,15 @@ public class Assistant extends Utilisateur {
         }
     }
 
-    private void recupTables() {
+    public void recupTables(Connection conn) {
         listTables = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while (rs.next()) {
                 listTables
                         .add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
             }
-            conn.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

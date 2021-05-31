@@ -30,6 +30,7 @@ public class GestionBDD {
         try {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
+            conn.close();
             return rs;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -46,6 +47,7 @@ public class GestionBDD {
         try {
             Statement st = conn.createStatement();
             st.executeUpdate(query);
+            conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();

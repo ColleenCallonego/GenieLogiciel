@@ -71,10 +71,10 @@ public class Directeur extends Utilisateur {
 
                 break;
             case 6:
-
+                consulterTempsRotationMoyen();
                 break;
             case 7:
-
+                consulterTempsPrep();
                 break;
         }
     }
@@ -85,14 +85,49 @@ public class Directeur extends Utilisateur {
         System.out.println("0.Consulter le profit du dejeuner" +
                 "\n1.Consulter le profit du diner" +
                 "\n2.Consulter l'ensemble des recettes" +
-                "\n3.Retourner au menu principal");
+                "\n3.Consulter la répartition de la recette selon les plats" +
+                "\n4.Retourner au menu principal");
         int num = scan.nextInt();
         Connection conn=GestionBDD.connect();
         switch (num){
             case 0: getProfitDejeuner(conn);break;
             case 1: getProfitDiner(conn);break;
             case 2: consulterRecettes();break;
+            case 3: getPlatProfit(conn);break;
         }
+    }
+
+    private void consulterTempsRotationMoyen(){
+        String query = "SELECT SUM( facture.heurefacture - commande.heurecommande )/COUNT(*) AS tempsrotationmoyen FROM commande JOIN facture ON facture.numerofacture = commande.facture";
+
+        Connection conn = GestionBDD.connect();
+        ResultSet rs = GestionBDD.executeSelect(conn,query);
+
+        try{
+            if (rs.next()){
+                System.out.println("temps de rotation moyen:  "+rs.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        attendreFinConsultation();
+    }
+
+    private void consulterTempsPrep() {
+        String query = "select sum( heurepreparation - heurecommande )/count(*) " +
+                "as tempspreparationmoyen from souscommande where heurepreparation notnull";
+
+        Connection conn = GestionBDD.connect();
+        ResultSet rs = GestionBDD.executeSelect(conn,query);
+
+        try{
+            if (rs.next()){
+                System.out.println("temps de preparation moyen:  "+rs.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        attendreFinConsultation();
     }
 
     private void consulterRecettes() {
@@ -102,22 +137,22 @@ public class Directeur extends Utilisateur {
         int num = scan.nextInt();
         String query,subQuery;
         switch (num){
-            case 0: subQuery = "heurecommande";
+            case 0: subQuery = "datecommande";
                 System.out.println("  Date             Recette");
                 break;
-            case 1: subQuery = "date_part('week',heurecommande)";
+            case 1: subQuery = "date_part('week',datecommande)";
                 System.out.println("  Semaine  Recette");
                 break;
-            case 2: subQuery = "date_part('month',heurecommande)";
+            case 2: subQuery = "date_part('month',datecommande)";
                 System.out.println("  Mois    Recette");
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + num);
         }
         query = "SELECT "+subQuery+" as date,SUM(total) as recette \n" +
-                "FROM (SELECT heurecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
-                "GROUP BY prixplat,heurecommande \n" +
-                "ORDER BY heurecommande ) as r GROUP BY date ORDER BY date DESC";
+                "FROM (SELECT datecommande,SUM(prixplat) as total from souscommande join plat ON souscommande.plat = plat.idplat\n" +
+                "GROUP BY prixplat,datecommande \n" +
+                "ORDER BY datecommande ) as r GROUP BY date ORDER BY date DESC";
 
         Connection conn = GestionBDD.connect();
         ResultSet rs = GestionBDD.executeSelect(conn,query);
@@ -157,7 +192,7 @@ public class Directeur extends Utilisateur {
 
 
 
-            conn.close();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -195,16 +230,11 @@ public class Directeur extends Utilisateur {
         System.out.println("id de l'employe ?");
         String name = scan.next();
 
-        try {
+        String query = "DELETE FROM utilisateur WHERE idutili='" + name + "'";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn,query);
 
-            String query = "DELETE FROM utilisateur WHERE idutili='" + name + "'";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn,query);
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 
 
@@ -217,16 +247,11 @@ public class Directeur extends Utilisateur {
         System.out.println("type/fonction ?");
         String type = scan.next();
 
-        try {
+        String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp + "','" + type + "')";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn,query);
 
-            String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp + "','" + type + "')";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn,query);
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 
     private void gestionMatPremieres() {
@@ -258,7 +283,7 @@ public class Directeur extends Utilisateur {
                     modifQuantite(choice, quantity);
             }
 
-            conn.close();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -274,18 +299,12 @@ public class Directeur extends Utilisateur {
         System.out.println("quantite ?");
         int quantity = scan.nextInt();
 
-        try {
+        String query = "INSERT INTO mp (nommp, stockmp) VALUES ('" + name + "','" + quantity + "')";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn, query);
 
-            String query = "INSERT INTO mp (nommp, stockmp) VALUES ('" + name + "','" + quantity + "')";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn, query);
+        System.out.println("changement effectue avec succes");
 
-            System.out.println("changement effectue avec succes");
-
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
 
     }
 
@@ -296,17 +315,12 @@ public class Directeur extends Utilisateur {
      * @param quantity
      */
     private void modifQuantite(int id, int quantity) {
-        try {
-            Connection conn = GestionBDD.connect();
-            String query = "UPDATE mp SET stockmp = '" + quantity + "' WHERE idmp ='" + id + "'";
-            GestionBDD.executeUpdate(conn, query);
+        Connection conn = GestionBDD.connect();
+        String query = "UPDATE mp SET stockmp = '" + quantity + "' WHERE idmp ='" + id + "'";
+        GestionBDD.executeUpdate(conn, query);
 
-            System.out.println("changement effectue avec succes");
+        System.out.println("changement effectue avec succes");
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
 
     }
 
@@ -378,7 +392,7 @@ public class Directeur extends Utilisateur {
         GestionBDD.executeUpdate(conn, sql);
     }
 
-    private Integer getIdCarteDuJour(Connection conn, Date d) {
+    public Integer getIdCarteDuJour(Connection conn, Date d) {
         try {
             String sql = "SELECT idcartedujour FROM cartedujour WHERE datecartejour = '" + d + "'";
             ResultSet rs = GestionBDD.executeSelect(conn, sql);
@@ -399,7 +413,7 @@ public class Directeur extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de plat
      */
-    private ArrayList<Plat> getPlats(Connection conn) {
+    public ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
             String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie";
@@ -454,6 +468,20 @@ public class Directeur extends Utilisateur {
             }
             System.out.println("Le profit du diner est de : " + somme + " €");
         } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void getPlatProfit(Connection conn){
+        String sql = "SELECT plat.nomplat, sum(plat.prixplat) FROM plat INNER JOIN souscommande ON plat.idplat = souscommande.plat INNER JOIN commande ON commande.numerocommande = souscommande.commande AND commande.statuscommande = 'Payée' GROUP BY plat.nomplat";
+        ResultSet rs = GestionBDD.executeSelect(conn, sql);
+        System.out.println("Voici les plats avec l'argent qu'ils ont rapportés : ");
+        try{
+            while (rs.next()){
+                System.out.println(rs.getString(1) + " : " + rs.getInt(2));
+            }
+        }
+        catch (SQLException throwables){
             throwables.printStackTrace();
         }
     }

@@ -1,7 +1,7 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import java.util.Scanner;
 import static fr.ul.miage.Restaurant.Resto.Main.scan;
 
 public class MaitreH extends Utilisateur {
-    private ArrayList<Table> listTables;
-    private ArrayList<String> listServeur;
+    public ArrayList<Table> listTables;
+    public ArrayList<String> listServeur;
 
     public MaitreH(String id) {
         super(id);
@@ -55,34 +55,26 @@ public class MaitreH extends Utilisateur {
         }
     }
 
-    private void recupTables() {
+    public void recupTables(Connection conn) {
         listTables = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while(rs.next()) {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
             }
-            conn.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void recupServeur() {
+    public void recupServeur(Connection conn) {
         listServeur = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT idutili FROM utilisateur WHERE typeutili = 'Serveur'");
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT idutili FROM utilisateur WHERE typeutili = 'Serveur'");
             while(rs.next()) {
                 listServeur.add(rs.getString(1));
             }
-            conn.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -92,7 +84,7 @@ public class MaitreH extends Utilisateur {
 
     private void affectationTable(){
         //recuperer les tables
-        recupTables();
+        recupTables(GestionBDD.connect());
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
@@ -136,7 +128,7 @@ public class MaitreH extends Utilisateur {
             //si oui
             if (rep == 1){
                 //recuperer les serveurs
-                recupServeur();
+                recupServeur(GestionBDD.connect());
                 //choisir un serveur changer dans la base
                 rep = -1;
                 scan = new Scanner(System.in);
@@ -161,10 +153,9 @@ public class MaitreH extends Utilisateur {
                 if (rep > 0){
                     String serveur = listServeur.get(rep-1);
                     try{
-                        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-                        Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+                        Connection conn = GestionBDD.connect();
                         Statement st = conn.createStatement();
-                        st.executeUpdate("UPDATE tableresto SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
+                        GestionBDD.executeUpdate(conn,"UPDATE tableresto SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
                         System.out.println("L'assignation a fonctionnée");
                     } catch (SQLException e) {
                         e.printStackTrace();
