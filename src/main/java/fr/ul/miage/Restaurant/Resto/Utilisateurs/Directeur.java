@@ -192,7 +192,7 @@ public class Directeur extends Utilisateur {
 
 
 
-            conn.close();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -230,16 +230,11 @@ public class Directeur extends Utilisateur {
         System.out.println("id de l'employe ?");
         String name = scan.next();
 
-        try {
+        String query = "DELETE FROM utilisateur WHERE idutili='" + name + "'";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn,query);
 
-            String query = "DELETE FROM utilisateur WHERE idutili='" + name + "'";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn,query);
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 
 
@@ -252,16 +247,11 @@ public class Directeur extends Utilisateur {
         System.out.println("type/fonction ?");
         String type = scan.next();
 
-        try {
+        String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp + "','" + type + "')";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn,query);
 
-            String query = "INSERT INTO utilisateur (idutili, mdp, typeutili) VALUES ('" + name + "','" + mdp + "','" + type + "')";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn,query);
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 
     private void gestionMatPremieres() {
@@ -293,7 +283,7 @@ public class Directeur extends Utilisateur {
                     modifQuantite(choice, quantity);
             }
 
-            conn.close();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -309,18 +299,12 @@ public class Directeur extends Utilisateur {
         System.out.println("quantite ?");
         int quantity = scan.nextInt();
 
-        try {
+        String query = "INSERT INTO mp (nommp, stockmp) VALUES ('" + name + "','" + quantity + "')";
+        Connection conn = GestionBDD.connect();
+        GestionBDD.executeUpdate(conn, query);
 
-            String query = "INSERT INTO mp (nommp, stockmp) VALUES ('" + name + "','" + quantity + "')";
-            Connection conn = GestionBDD.connect();
-            GestionBDD.executeUpdate(conn, query);
+        System.out.println("changement effectue avec succes");
 
-            System.out.println("changement effectue avec succes");
-
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
 
     }
 
@@ -331,17 +315,12 @@ public class Directeur extends Utilisateur {
      * @param quantity
      */
     private void modifQuantite(int id, int quantity) {
-        try {
-            Connection conn = GestionBDD.connect();
-            String query = "UPDATE mp SET stockmp = '" + quantity + "' WHERE idmp ='" + id + "'";
-            GestionBDD.executeUpdate(conn, query);
+        Connection conn = GestionBDD.connect();
+        String query = "UPDATE mp SET stockmp = '" + quantity + "' WHERE idmp ='" + id + "'";
+        GestionBDD.executeUpdate(conn, query);
 
-            System.out.println("changement effectue avec succes");
+        System.out.println("changement effectue avec succes");
 
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
 
     }
 

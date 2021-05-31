@@ -1,7 +1,7 @@
 package fr.ul.miage.Restaurant.Resto.Utilisateurs;
 
-import fr.ul.miage.Restaurant.Resto.ColorText;
 import fr.ul.miage.Restaurant.Resto.Table;
+import fr.ul.miage.Restaurant.Resto.misc.GestionBDD;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -58,14 +58,11 @@ public class MaitreH extends Utilisateur {
     private void recupTables() {
         listTables = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM tableresto ORDER BY numero");
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while(rs.next()) {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5)));
             }
-            conn.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -75,14 +72,11 @@ public class MaitreH extends Utilisateur {
     private void recupServeur() {
         listServeur = new ArrayList<>();
         try {
-            String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-            Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT idutili FROM utilisateur WHERE typeutili = 'Serveur'");
+            Connection conn = GestionBDD.connect();
+            ResultSet rs = GestionBDD.executeSelect(conn,"SELECT idutili FROM utilisateur WHERE typeutili = 'Serveur'");
             while(rs.next()) {
                 listServeur.add(rs.getString(1));
             }
-            conn.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -161,10 +155,9 @@ public class MaitreH extends Utilisateur {
                 if (rep > 0){
                     String serveur = listServeur.get(rep-1);
                     try{
-                        String url = "jdbc:postgresql://plg-broker.ad.univ-lorraine.fr/Restaurant_G8";
-                        Connection conn = DriverManager.getConnection(url, "m1user1_03", "m1user1_03");
+                        Connection conn = GestionBDD.connect();
                         Statement st = conn.createStatement();
-                        st.executeUpdate("UPDATE tableresto SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
+                        GestionBDD.executeUpdate(conn,"UPDATE tableresto SET serveur = '" + serveur + "' WHERE numero = " + (numTab+1));
                         System.out.println("L'assignation a fonctionnée");
                     } catch (SQLException e) {
                         e.printStackTrace();
