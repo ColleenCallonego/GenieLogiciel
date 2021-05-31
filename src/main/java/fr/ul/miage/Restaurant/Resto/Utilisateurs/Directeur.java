@@ -86,7 +86,8 @@ public class Directeur extends Utilisateur {
                 "\n1.Consulter le profit du diner" +
                 "\n2.Consulter l'ensemble des recettes" +
                 "\n3.Consulter le temps de preparation moyen" +
-                "\n4.Retourner au menu principal");
+                "\n4.Consulter la répartition de la recette selon les plats" +
+                "\n5.Retourner au menu principal");
         int num = scan.nextInt();
         Connection conn=GestionBDD.connect();
         switch (num){
@@ -94,6 +95,7 @@ public class Directeur extends Utilisateur {
             case 1: getProfitDiner(conn);break;
             case 2: consulterRecettes();break;
             case 3: consulterTempsPrep();break;
+            case 4: getPlatProfit(conn);break;
         }
     }
 
@@ -473,6 +475,20 @@ public class Directeur extends Utilisateur {
             }
             System.out.println("Le profit du diner est de : " + somme + " €");
         } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void getPlatProfit(Connection conn){
+        String sql = "SELECT plat.nomplat, sum(plat.prixplat) FROM plat INNER JOIN souscommande ON plat.idplat = souscommande.plat INNER JOIN commande ON commande.numerocommande = souscommande.commande AND commande.statuscommande = 'Payée' GROUP BY plat.nomplat";
+        ResultSet rs = GestionBDD.executeSelect(conn, sql);
+        System.out.println("Voici les plats avec l'argent qu'ils ont rapportés : ");
+        try{
+            while (rs.next()){
+                System.out.println(rs.getString(1) + " : " + rs.getInt(2));
+            }
+        }
+        catch (SQLException throwables){
             throwables.printStackTrace();
         }
     }
