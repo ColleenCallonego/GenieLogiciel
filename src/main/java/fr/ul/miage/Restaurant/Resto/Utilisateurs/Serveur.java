@@ -26,7 +26,7 @@ public class Serveur extends Utilisateur {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3),
                         rs.getString(4), rs.getString(5)));
             }
-            conn.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,7 +41,7 @@ public class Serveur extends Utilisateur {
             while (rs.next()) {
                 listCategories.add(new Categorie(rs.getInt(1), rs.getString(2)));
             }
-            conn.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -65,7 +65,7 @@ public class Serveur extends Utilisateur {
             while (rs.next()) {
                 listPlats.add(new Plat(rs.getInt(1), rs.getString(2), rs.getInt(3)));
             }
-            conn.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -186,15 +186,11 @@ public class Serveur extends Utilisateur {
         if (rep > 0) {
             //changer l'état dans la base
             String nouvelEtat = listeEtat.get(rep - 1);
-            try {
 
-                Connection conn = GestionBDD.connect();
-                GestionBDD.executeUpdate(conn,"UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
-                System.out.println("La modification a fonctionnée");
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            Connection conn = GestionBDD.connect();
+            GestionBDD.executeUpdate(conn,"UPDATE tableresto SET etattable = '" + nouvelEtat + "' WHERE numero = " + (numTable));
+            System.out.println("La modification a fonctionnée");
+
         } else {
             System.out.println("Modification annulée");
         }

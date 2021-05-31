@@ -72,136 +72,132 @@ public class Cuisinier extends Utilisateur {
     }
 
     private void definitionPlat() {
-        try {
-            String nomPlat = "";
-            Connection conn = GestionBDD.connect();
-            // Visualisation des plats déjà présents
-            ArrayList<Plat> plats = getPlats(conn);
-            if (plats.isEmpty()) {
-                System.out.println("Il n'y a pas encore de plat enregistré.");
-            } else {
-                System.out.println("Voici les plats déjà enregistré :");
-                for (Plat plat : plats) {
-                    System.out.println("- " + plat);
-                }
+        String nomPlat = "";
+        Connection conn = GestionBDD.connect();
+        // Visualisation des plats déjà présents
+        ArrayList<Plat> plats = getPlats(conn);
+        if (plats.isEmpty()) {
+            System.out.println("Il n'y a pas encore de plat enregistré.");
+        } else {
+            System.out.println("Voici les plats déjà enregistré :");
+            for (Plat plat : plats) {
+                System.out.println("- " + plat);
             }
+        }
 
-            // récupérer le nom du plat à ajouter
-            Boolean bonNom = false;
-            while (!bonNom) {
-                try {
-                    Scanner sa = new Scanner(System.in);
-                    System.out.println("Quel plat voulez vous ajouter ? (Entrez son nom)");
-                    nomPlat = sa.nextLine();
-                    if (!verifNomPlat(nomPlat, plats)) {
-                        System.out.println("Ce plat existe déjà");
-                    } else {
-                        bonNom = true;
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Nom non valide");
+        // récupérer le nom du plat à ajouter
+        Boolean bonNom = false;
+        while (!bonNom) {
+            try {
+                Scanner sa = new Scanner(System.in);
+                System.out.println("Quel plat voulez vous ajouter ? (Entrez son nom)");
+                nomPlat = sa.nextLine();
+                if (!verifNomPlat(nomPlat, plats)) {
+                    System.out.println("Ce plat existe déjà");
+                } else {
+                    bonNom = true;
                 }
+            } catch (InputMismatchException e) {
+                System.out.println("Nom non valide");
             }
+        }
 
-            // récupérer le prix du plat à ajouter
-            Boolean bonPrix = false;
-            Integer prix = 0;
-            while (!bonPrix) {
-                try {
-                    Scanner s = new Scanner(System.in);
-                    System.out.println("Quel est le prix de ce plat ? (Un prix entier)");
-                    prix = s.nextInt();
-                    if (prix > 0) {
-                        bonPrix = true;
-                    } else {
-                        System.out.println("Prix non valide");
-                    }
-                } catch (InputMismatchException e) {
+        // récupérer le prix du plat à ajouter
+        Boolean bonPrix = false;
+        Integer prix = 0;
+        while (!bonPrix) {
+            try {
+                Scanner s = new Scanner(System.in);
+                System.out.println("Quel est le prix de ce plat ? (Un prix entier)");
+                prix = s.nextInt();
+                if (prix > 0) {
+                    bonPrix = true;
+                } else {
                     System.out.println("Prix non valide");
                 }
+            } catch (InputMismatchException e) {
+                System.out.println("Prix non valide");
             }
+        }
 
-            // récupérer la catégorie du plat à ajouter
-            ArrayList<Categorie> cates = getCategories(conn);
-            Boolean bonneCat = false;
-            Integer numCat = 0;
-            Integer j = 1;
-            while (!bonneCat) {
-                for (Categorie categorie : cates) {
-                    System.out.println("-" + j + " " + categorie);
-                    j++;
-                }
-                try {
-                    Scanner s = new Scanner(System.in);
-                    System.out.println("Quelle est la catégorie de ce plat ? (tapez son numéro)");
-                    numCat = s.nextInt();
-                    if (verif(numCat, cates.size() + 2) && numCat != 0) {
-                        bonneCat = true;
-                    } else {
-                        System.out.println("Entrée non valide");
-                    }
-                } catch (InputMismatchException e) {
+        // récupérer la catégorie du plat à ajouter
+        ArrayList<Categorie> cates = getCategories(conn);
+        Boolean bonneCat = false;
+        Integer numCat = 0;
+        Integer j = 1;
+        while (!bonneCat) {
+            for (Categorie categorie : cates) {
+                System.out.println("-" + j + " " + categorie);
+                j++;
+            }
+            try {
+                Scanner s = new Scanner(System.in);
+                System.out.println("Quelle est la catégorie de ce plat ? (tapez son numéro)");
+                numCat = s.nextInt();
+                if (verif(numCat, cates.size() + 2) && numCat != 0) {
+                    bonneCat = true;
+                } else {
                     System.out.println("Entrée non valide");
                 }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée non valide");
             }
+        }
 
-            // ajout du plat dans la base
-            insererPlat(conn, nomPlat, prix, cates.get(numCat - 1).getIdcategorie());
-            Integer idPlat = getIdPlat(conn, nomPlat);
+        // ajout du plat dans la base
+        insererPlat(conn, nomPlat, prix, cates.get(numCat - 1).getIdcategorie());
+        Integer idPlat = getIdPlat(conn, nomPlat);
 
-            // ajout du mp pour le plat
-            Boolean encoreMp = true;
-            ArrayList<Mp> mps = getMPs(conn);
-            Integer numMp;
-            while (encoreMp) {
-                Integer i = 1;
-                for (Mp mp : mps) {
-                    System.out.println("-" + i + " " + mp);
-                    i++;
-                }
-                try {
-                    Scanner s = new Scanner(System.in);
-                    System.out.println("Quelle matière première voulez vous ajouter au plat ? (tapez son numéro)");
-                    numMp = s.nextInt();
-                    if (verif(numMp, mps.size() + 2) && numMp != 0) {
-                        s = new Scanner(System.in);
-                        Integer quantite;
-                        System.out.println(
-                                "Combien de matière première ce plat nécessite-t-il ? (entrez une quantité entière)");
-                        quantite = s.nextInt();
-                        insererPlat_mp(conn, idPlat, mps.get(numMp - 1).getIdmp(), quantite);
-                        Boolean mauvaiseRep = true;
-                        while (mauvaiseRep) {
-                            try {
-                                String rep;
-                                s = new Scanner(System.in);
-                                System.out.println("Ajouter une autre matière première à ce plat ? (Oui ou Non)");
-                                rep = s.nextLine();
-                                if (rep.equals("Oui")) {
-                                    encoreMp = true;
-                                    mauvaiseRep = false;
-                                } else if (rep.equals("Non")) {
-                                    encoreMp = false;
-                                    mauvaiseRep = false;
-                                } else {
-                                    System.out.println("Réponse non valide");
-                                }
-                            } catch (InputMismatchException e) {
+        // ajout du mp pour le plat
+        Boolean encoreMp = true;
+        ArrayList<Mp> mps = getMPs(conn);
+        Integer numMp;
+        while (encoreMp) {
+            Integer i = 1;
+            for (Mp mp : mps) {
+                System.out.println("-" + i + " " + mp);
+                i++;
+            }
+            try {
+                Scanner s = new Scanner(System.in);
+                System.out.println("Quelle matière première voulez vous ajouter au plat ? (tapez son numéro)");
+                numMp = s.nextInt();
+                if (verif(numMp, mps.size() + 2) && numMp != 0) {
+                    s = new Scanner(System.in);
+                    Integer quantite;
+                    System.out.println(
+                            "Combien de matière première ce plat nécessite-t-il ? (entrez une quantité entière)");
+                    quantite = s.nextInt();
+                    insererPlat_mp(conn, idPlat, mps.get(numMp - 1).getIdmp(), quantite);
+                    Boolean mauvaiseRep = true;
+                    while (mauvaiseRep) {
+                        try {
+                            String rep;
+                            s = new Scanner(System.in);
+                            System.out.println("Ajouter une autre matière première à ce plat ? (Oui ou Non)");
+                            rep = s.nextLine();
+                            if (rep.equals("Oui")) {
+                                encoreMp = true;
+                                mauvaiseRep = false;
+                            } else if (rep.equals("Non")) {
+                                encoreMp = false;
+                                mauvaiseRep = false;
+                            } else {
                                 System.out.println("Réponse non valide");
                             }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Réponse non valide");
                         }
-                    } else {
-                        System.out.println("Entrée non valide");
                     }
-                } catch (InputMismatchException e) {
+                } else {
                     System.out.println("Entrée non valide");
                 }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée non valide");
             }
-
-            conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+
+
     }
 
     /**
