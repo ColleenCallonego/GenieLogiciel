@@ -71,10 +71,10 @@ public class Directeur extends Utilisateur {
 
                 break;
             case 6:
-
+                consulterTempsRotationMoyen();
                 break;
             case 7:
-
+                consulterTempsPrep();
                 break;
         }
     }
@@ -85,18 +85,32 @@ public class Directeur extends Utilisateur {
         System.out.println("0.Consulter le profit du dejeuner" +
                 "\n1.Consulter le profit du diner" +
                 "\n2.Consulter l'ensemble des recettes" +
-                "\n3.Consulter le temps de preparation moyen" +
-                "\n4.Consulter la répartition de la recette selon les plats" +
-                "\n5.Retourner au menu principal");
+                "\n3.Consulter la répartition de la recette selon les plats" +
+                "\n4.Retourner au menu principal");
         int num = scan.nextInt();
         Connection conn=GestionBDD.connect();
         switch (num){
             case 0: getProfitDejeuner(conn);break;
             case 1: getProfitDiner(conn);break;
             case 2: consulterRecettes();break;
-            case 3: consulterTempsPrep();break;
-            case 4: getPlatProfit(conn);break;
+            case 3: getPlatProfit(conn);break;
         }
+    }
+
+    private void consulterTempsRotationMoyen(){
+        String query = "SELECT SUM( facture.heurefacture - commande.heurecommande )/COUNT(*) AS tempsrotationmoyen FROM commande JOIN facture ON facture.numerofacture = commande.facture";
+
+        Connection conn = GestionBDD.connect();
+        ResultSet rs = GestionBDD.executeSelect(conn,query);
+
+        try{
+            if (rs.next()){
+                System.out.println("temps de rotation moyen:  "+rs.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        attendreFinConsultation();
     }
 
     private void consulterTempsPrep() {
