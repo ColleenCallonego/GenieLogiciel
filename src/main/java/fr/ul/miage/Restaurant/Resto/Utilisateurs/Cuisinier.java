@@ -253,7 +253,7 @@ public class Cuisinier extends Utilisateur {
      * @param nom
      * @return
      */
-    private Integer getIdPlat(Connection conn, String nom) {
+    public Integer getIdPlat(Connection conn, String nom) {
         try {
 
             String sql = "SELECT idplat FROM plat WHERE nomplat = '" + nom + "'";
@@ -272,7 +272,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn le connection à la base
      * @return une liste de catégorie
      */
-    private ArrayList<Categorie> getCategories(Connection conn) {
+    public ArrayList<Categorie> getCategories(Connection conn) {
         ArrayList<Categorie> cats = new ArrayList<Categorie>();
         try {
 
@@ -292,7 +292,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de plat
      */
-    private ArrayList<Plat> getPlats(Connection conn) {
+    public ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
 
@@ -314,7 +314,7 @@ public class Cuisinier extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de mp
      */
-    private ArrayList<Mp> getMPs(Connection conn) {
+    public ArrayList<Mp> getMPs(Connection conn) {
         ArrayList<Mp> mps = new ArrayList<Mp>();
         try {
 
@@ -400,11 +400,11 @@ public class Cuisinier extends Utilisateur {
      *
      * @param conn connection à la base
      */
-    private ArrayList<SousCommande> getListeAttente(Connection conn) {
+    public ArrayList<SousCommande> getListeAttente(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 
-            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC;");
+            ResultSet rs = GestionBDD.executeSelect(conn, "SELECT souscommande.idsouscommande, plat.nomplat FROM souscommande JOIN plat ON plat.idplat = souscommande.plat WHERE souscommande.etatsouscommande = 'commande' AND plat.nomplat != 'Menu enfant' ORDER BY souscommande.heurecommande ASC");
             while (rs.next()) {
                 sscommandes.add(new SousCommande(rs.getInt(1), rs.getString(2)));
             }
@@ -419,7 +419,7 @@ public class Cuisinier extends Utilisateur {
      *
      * @param conn connection à la base
      */
-    private ArrayList<SousCommande> getListeAttenteEnfant(Connection conn) {
+    public ArrayList<SousCommande> getListeAttenteEnfant(Connection conn) {
         ArrayList<SousCommande> sscommandes = new ArrayList<SousCommande>();
         try {
 
