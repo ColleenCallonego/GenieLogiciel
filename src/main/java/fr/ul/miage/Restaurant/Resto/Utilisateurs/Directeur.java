@@ -392,7 +392,7 @@ public class Directeur extends Utilisateur {
         GestionBDD.executeUpdate(conn, sql);
     }
 
-    private Integer getIdCarteDuJour(Connection conn, Date d) {
+    public Integer getIdCarteDuJour(Connection conn, Date d) {
         try {
             String sql = "SELECT idcartedujour FROM cartedujour WHERE datecartejour = '" + d + "'";
             ResultSet rs = GestionBDD.executeSelect(conn, sql);
@@ -413,7 +413,7 @@ public class Directeur extends Utilisateur {
      * @param conn la connection à la base
      * @return une liste de plat
      */
-    private ArrayList<Plat> getPlats(Connection conn) {
+    public ArrayList<Plat> getPlats(Connection conn) {
         ArrayList<Plat> plats = new ArrayList<Plat>();
         try {
             String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat, categorie.nomcategorie FROM plat JOIN categorie ON plat.cat = categorie.idcategorie";
