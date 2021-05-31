@@ -10,17 +10,16 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Serveur extends Utilisateur {
-    private ArrayList<Table> listTables;
+    public ArrayList<Table> listTables;
 
     public Serveur(String id) {
         super(id);
         listTables = new ArrayList<>();
     }
 
-    private void recupTables() {
+    public void recupTables(Connection conn) {
         listTables = new ArrayList<>();
         try {
-            Connection conn = GestionBDD.connect();
             ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM tableresto ORDER BY numero");
             while (rs.next()) {
                 listTables.add(new Table(rs.getInt(1), rs.getInt(2), rs.getString(3),
@@ -32,11 +31,9 @@ public class Serveur extends Utilisateur {
         }
     }
 
-    private ArrayList<Categorie> recupCategories() {
+    public ArrayList<Categorie> recupCategories(Connection conn) {
         ArrayList<Categorie> listCategories = new ArrayList<>();
         try {
-
-            Connection conn = GestionBDD.connect();
             ResultSet rs = GestionBDD.executeSelect(conn,"SELECT * FROM categorie");
             while (rs.next()) {
                 listCategories.add(new Categorie(rs.getInt(1), rs.getString(2)));
@@ -48,17 +45,15 @@ public class Serveur extends Utilisateur {
         return listCategories;
     }
 
-    private ArrayList<Plat> recupPlats(int idCategorie) {
+    public ArrayList<Plat> recupPlats(Connection conn, int idCategorie) {
         ArrayList<Plat> listPlats = new ArrayList<>();
         Date dateJour = new Date();
         try {
-
-            Connection conn = GestionBDD.connect();
             String query = "SELECT plat.idplat, plat.nomplat, plat.prixplat FROM plat JOIN cartejour_plat " +
                     "ON cartejour_plat.plat = plat.idplat JOIN cartedujour ON cartedujour.idcartedujour = cartejour_plat.carte" +
                     " AND cartedujour.datecartejour = '" + dateJour + "' AND plat.cat =" + idCategorie +
                     "JOIN plat_mp ON plat_mp.plat = plat.idplat JOIN mp ON plat_mp.mp = mp.idmp " +
-                    "WHERE plat_mp.quantite <= mp.stockmp" +
+                    "WHERE plat_mp.quantite <= mp.stockmp " +
                     "GROUP BY plat.nomplat, plat.idplat HAVING COUNT(*) = plat.nbmp";
 
             ResultSet rs = GestionBDD.executeSelect(conn,query);
@@ -72,10 +67,9 @@ public class Serveur extends Utilisateur {
         return listPlats;
     }
 
-    private ArrayList<CommandeFacture> recupCommande(int numTable) {
+    public ArrayList<CommandeFacture> recupCommande(Connection conn, int numTable) {
         ArrayList<CommandeFacture> listCommande = new ArrayList<>();
         try {
-            Connection conn = GestionBDD.connect();
             String query = "SELECT commande.numerocommande, commande.datecommande, plat.nomplat, plat.prixplat FROM commande " +
                     "JOIN souscommande ON commande.numerocommande = souscommande.commande " +
                     "JOIN plat ON souscommande.plat = plat.idplat " +
@@ -95,7 +89,7 @@ public class Serveur extends Utilisateur {
 
     @Override
     public Integer afficherPrincipal() {
-        recupTables();
+        recupTables(GestionBDD.connect());
         int rep = -1;
         Scanner scan = new Scanner(System.in);
         String n = System.getProperty("line.separator");
@@ -252,7 +246,7 @@ public class Serveur extends Utilisateur {
     }
 
     private void imprimerFacture(int numTab) {
-        ArrayList<CommandeFacture> listeCommandFacture = recupCommande(numTab);
+        ArrayList<CommandeFacture> listeCommandFacture = recupCommande(GestionBDD.connect(), numTab);
         //affichage/impression de la facture
         int total = 0;
         System.out.println("FACTURE     table " + numTab);
@@ -359,7 +353,7 @@ public class Serveur extends Utilisateur {
      * @param plat plat concerné
      * @return une liste de matière première présente dans le plat
      */
-    private ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat) {
+    public ArrayList<Mp> getInfoMpPlat(Connection conn, Integer plat) {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
             String sql = "SELECT mp, quantite FROM plat_mp WHERE plat = '" + plat + "'";
@@ -381,7 +375,7 @@ public class Serveur extends Utilisateur {
      * @param mps  liste de matière première
      * @return une liste avec les infos des matières premières
      */
-    private ArrayList<Mp> getInfoMp(Connection conn, ArrayList<Mp> mps) {
+    public ArrayList<Mp> getInfoMp(Connection conn, ArrayList<Mp> mps) {
         try {
             ArrayList<Mp> list = new ArrayList<Mp>();
             for (Mp mp : mps) {
@@ -441,7 +435,7 @@ public class Serveur extends Utilisateur {
      * @param table numéro de la table concerné
      * @return le numéro de la table si une commande en cours pour cette table existe, -1 sinon
      */
-    private Integer getIdCommande(Connection conn, Integer table) {
+    public Integer getIdCommande(Connection conn, Integer table) {
         try {
 
             String sql = "SELECT numerocommande FROM commande WHERE tableresto = '" + table + "' AND statuscommande = 'En cours'";
@@ -467,7 +461,7 @@ public class Serveur extends Utilisateur {
         Categorie categorieChoisie;
         Plat platChoisi;
         System.out.println("Nos catégories de plats :");
-        listCategories = recupCategories();
+        listCategories = recupCategories(GestionBDD.connect());
         for (Categorie categorie : listCategories) {
             System.out.println("\u001B[97m" + "[" + categorie.getNomcategorie() + "]" + "\u001B[0m");
         }
@@ -487,7 +481,7 @@ public class Serveur extends Utilisateur {
         if (rep > 0) {
             categorieChoisie = listCategories.get(rep - 1);
             rep = -1;
-            listePlats = recupPlats(categorieChoisie.getIdcategorie());
+            listePlats = recupPlats(GestionBDD.connect(), categorieChoisie.getIdcategorie());
             System.out.println("Nos plats");
             for (Plat plat : listePlats) {
                 System.out.println("\u001B[97m" + "[" + plat.getNomplat() + " à " + plat.getPrixplat() + "]" + "\u001B[0m");
